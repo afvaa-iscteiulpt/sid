@@ -40,11 +40,7 @@ public class LoginActivity extends AppCompatActivity {
 
         //check if previous login information is in cache
         checkDefaults();
-
-
     }
-
-
 
     private void checkDefaults() {
 

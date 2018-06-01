@@ -2,13 +2,10 @@ package inducesmile.com.sid.App;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -31,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String password = UserLogin.getInstance().getPassword();
     DataBaseHandler db = new DataBaseHandler(this);
 
-    //download data from sybase
+    //info for download data from sybase
     public static final String READ_HUMIDADE_TEMPERATURA = "http://" + IP + ":" + PORT + "/getHumidade_Temperatura.php";
     public static final String READ_ALERTAS = "http://" + IP + ":" + PORT + "/getAlertas.php";
     public static final String READ_Cultura = "http://" + IP + ":" + PORT + "/getCultura.php";
@@ -41,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        fetchCulturasParaSpinner();
         db.dbClear();
     }
 
@@ -55,10 +54,37 @@ public class MainActivity extends AppCompatActivity {
         startActivity(i);
     }
 
+    private void fetchCulturasParaSpinner() {
+        try {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+            HashMap<String, String> params = new HashMap<>();
+            params.put("username", username);
+            params.put("password", password);
+            ConnectionHandler jParser = new ConnectionHandler();
+            JSONArray jsonHumidadeTemperatura = jParser.getJSONFromUrl(READ_HUMIDADE_TEMPERATURA, params);
+            db.dbClear();
+
+            JSONArray jsonCultura = jParser.getJSONFromUrl(READ_Cultura,params);
+            if (jsonCultura!=null){
+                for (int i = 0; i < jsonCultura.length(); i++) {
+                    JSONObject c = jsonCultura.getJSONObject(i);
+                    int idCultura = c.getInt("idCultura");
+                    String nomeCultura = c.getString("NomeCultura");
+                    
+                }
+
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void refreshDB(View v){
         String idCultura = findViewById(spinner).toString();
         if (idCultura != null){
-            writeToDB(idCultura);
+            copyDataToDBWithCulturaID(idCultura);
             //idCultura.onEditorAction(EditorInfo.IME_ACTION_DONE);
             updateNomeCultura();
             updateNumeroMedicoes();
@@ -118,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
 
 //A minha base de dados pode não ser exatamente igual à vossa ou podem concluir que é melhor implementar isto de outra maneira, para mudarem a base de dados no android usem as classes DatabaseConfig(criação) e DatabaseHandler(escrita)
 
-    public void writeToDB(String idCultura) {
+    public void copyDataToDBWithCulturaID(String idCultura) {
         try {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);

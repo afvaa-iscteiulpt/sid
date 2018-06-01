@@ -20,6 +20,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
     public DataBaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
+
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(config.SQL_CREATE_HUMIDADE_TEMPERATURA);
