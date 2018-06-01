@@ -21,8 +21,8 @@ public class DataBaseConfig {
         public static final String TABLE_NAME="AlertasHumidadeTemperatura";
         public static final String COLUMN_NAME_IDALERTA="idAlerta";
         public static final String COLUMN_NAME_DATAHORAMEDICAO ="dataHora";
-        public static final String COLUMN_NAME_VALORMEDICAO="valorReg";
         public static final String COLUMN_NAME_IDCULTURA ="idCultura";
+        public static final String COLUMN_NAME_VALORMEDICAO="valorReg";
         public static final String COLUMN_NAME_TIPOALERTAS ="tipoAlerta";
     }
 
