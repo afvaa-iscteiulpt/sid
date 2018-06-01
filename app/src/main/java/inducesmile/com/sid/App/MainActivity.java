@@ -1,14 +1,11 @@
 package inducesmile.com.sid.App;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
@@ -17,15 +14,12 @@ import android.widget.TextView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.HashMap;
 
 import inducesmile.com.sid.Connection.ConnectionHandler;
 import inducesmile.com.sid.DataBase.DataBaseHandler;
 import inducesmile.com.sid.DataBase.DataBaseReader;
-import inducesmile.com.sid.Helper.Alert;
-import inducesmile.com.sid.Helper.LoginValidation;
 import inducesmile.com.sid.Helper.UserLogin;
 import inducesmile.com.sid.R;
 
@@ -41,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String READ_HUMIDADE_TEMPERATURA = "http://" + IP + ":" + PORT + "/getHumidade_Temperatura.php";
     public static final String READ_ALERTAS = "http://" + IP + ":" + PORT + "/getAlertas.php";
     public static final String READ_Cultura = "http://" + IP + ":" + PORT + "/getCultura.php";
-
+    private int spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,10 +56,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void refreshDB(View v){
-        EditText idCultura = findViewById(R.id.idCultura);
-        if (idCultura.getText() != null){
-            writeToDB(idCultura.getText().toString());
-            idCultura.onEditorAction(EditorInfo.IME_ACTION_DONE);
+        String idCultura = findViewById(spinner).toString();
+        if (idCultura != null){
+            writeToDB(idCultura);
+            //idCultura.onEditorAction(EditorInfo.IME_ACTION_DONE);
             updateNomeCultura();
             updateNumeroMedicoes();
             updateNumeroAlertas();
@@ -101,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
     private void updateNomeCultura(){
 
         //To do?
-        DataBaseReader dbReader = new DataBaseReader(db);
+        /*DataBaseReader dbReader = new DataBaseReader(db);
 
         TextView nomeCultura_tv= findViewById(R.id.nomeCultura_tv);
         Cursor cursor = dbReader.readCultura();
@@ -119,13 +113,12 @@ public class MainActivity extends AppCompatActivity {
             nomeCultura_tv.setTextColor(Color.RED);
         }
 
-        nomeCultura_tv.setVisibility(View.VISIBLE);
+        nomeCultura_tv.setVisibility(View.VISIBLE);*/
     }
 
 //A minha base de dados pode não ser exatamente igual à vossa ou podem concluir que é melhor implementar isto de outra maneira, para mudarem a base de dados no android usem as classes DatabaseConfig(criação) e DatabaseHandler(escrita)
 
     public void writeToDB(String idCultura) {
-
         try {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
@@ -137,16 +130,15 @@ public class MainActivity extends AppCompatActivity {
             JSONArray jsonHumidadeTemperatura = jParser.getJSONFromUrl(READ_HUMIDADE_TEMPERATURA, params);
             db.dbClear();
             if (jsonHumidadeTemperatura !=null){
-            for (int i = 0; i < jsonHumidadeTemperatura.length(); i++) {
-                JSONObject c = jsonHumidadeTemperatura.getJSONObject(i);
-                int idMedicao = c.getInt("IDMedicao");
-                String horaMedicao = c.getString("HoraMedicao");
-                double valorMedicaoTemperatura = c.getDouble("ValorMedicaoTemperatura");
-                double valorMedicaoHumidade = c.getDouble("ValorMedicaoHumidade");
-                String dataMedicao = c.getString("DataMedicao");
-                int idCultura2 = c.getInt("IDCultura");
-                db.insert_Humidade_Temperatura(idMedicao,idCultura2,horaMedicao,valorMedicaoTemperatura,valorMedicaoHumidade,dataMedicao);
-            }
+                for (int i = 0; i < jsonHumidadeTemperatura.length(); i++) {
+                    JSONObject c = jsonHumidadeTemperatura.getJSONObject(i);
+                    int idMedicao = c.getInt("IDMedicao");
+                    String dataHoraMedicao = c.getString("DataHoraMedicao");
+                    double valorMedicaoTemperatura = c.getDouble("ValorMedicaoTemperatura");
+                    double valorMedicaoHumidade = c.getDouble("ValorMedicaoHumidade");
+                    int idCultura2 = c.getInt("IDCultura");
+                    db.insert_Humidade_Temperatura(idMedicao,idCultura2,dataHoraMedicao,valorMedicaoTemperatura,valorMedicaoHumidade);
+                }
             }
 
             JSONArray jsonAlertas = jParser.getJSONFromUrl(READ_ALERTAS,params);
@@ -154,12 +146,11 @@ public class MainActivity extends AppCompatActivity {
                 for (int i = 0; i < jsonAlertas.length(); i++) {
                     JSONObject c = jsonAlertas.getJSONObject(i);
                     int IDAlerta = c.getInt("IDAlerta");
-                    String dataMedicao = c.getString("DataMedicao");
+                    String dataMedicao = c.getString("DataHoraMedicao");
                     double valorMedicao = c.getDouble("ValorMedicao");
-                    String horaMedicao = c.getString("HoraMedicao");
-                    String nomeVariavel = c.getString("NomeVariavel");
+                    String dataHoraMedicao = c.getString("HoraMedicao");
                     String alerta = c.getString("Alerta");
-                    db.insert_Alertas(IDAlerta,dataMedicao,valorMedicao,horaMedicao,nomeVariavel,alerta);
+                    db.insert_Alertas(IDAlerta,dataMedicao,valorMedicao,dataHoraMedicao,alerta);
                 }
 
             }
@@ -169,7 +160,11 @@ public class MainActivity extends AppCompatActivity {
                 for (int i = 0; i < jsonCultura.length(); i++) {
                     JSONObject c = jsonCultura.getJSONObject(i);
                     String nomeCultura = c.getString("NomeCultura");
-                    db.insert_Cultura(Integer.parseInt(idCultura),nomeCultura);
+                    double limSupTempCultura = c.getDouble("LimiteSuperiorTemperatura");
+                    double limInfTempCultura = c.getDouble("LimiteInferiorTemperatura");
+                    double limSupHumiCultura = c.getDouble("LimiteSuperiorHumidade");
+                    double limInfHumiCultura = c.getDouble("LimiteInferiorHumidade");
+                    db.insert_Cultura(Integer.parseInt(idCultura),nomeCultura,limSupTempCultura,limInfTempCultura,limSupHumiCultura,limInfHumiCultura);
                 }
 
             }
@@ -177,7 +172,6 @@ public class MainActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
     }
 
 }

@@ -5,8 +5,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import inducesmile.com.sid.DataBase.DataBaseConfig;
-
 /**
  * Created by joao on 11/04/2018.
  */
@@ -47,35 +45,34 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         onCreate(getWritableDatabase());
     }
 
-    public void insert_Humidade_Temperatura(int idMedicao,int IDCultura,String horaMedicao,double valorMedicaoTemperatura,double valorMedicaoHumidade,String dataMedicao){
+    public void insert_Humidade_Temperatura(int idMedicao,int IDCultura,String datahoraMedicao,double valorMedicaoTemperatura,double valorMedicaoHumidade){
         ContentValues values = new ContentValues();
         values.put(DataBaseConfig.HumidadeTemperatura.COLUMN_NAME_IDMEDICAO,idMedicao);
-        values.put(DataBaseConfig.HumidadeTemperatura.COLUMN_NAME_HORAMEDICAO,horaMedicao);
+        values.put(DataBaseConfig.HumidadeTemperatura.COLUMN_NAME_DATAHORAMEDICAO,datahoraMedicao);
         values.put(DataBaseConfig.HumidadeTemperatura.COLUMN_NAME_VALORMEDICAOTEMPERATURA,valorMedicaoTemperatura);
         values.put(DataBaseConfig.HumidadeTemperatura.COLUMN_NAME_VALORMEDICAOHUMIDADE,valorMedicaoHumidade);
-        values.put(DataBaseConfig.HumidadeTemperatura.COLUMN_NAME_DATAMEDICAO,dataMedicao);
-        values.put(DataBaseConfig.HumidadeTemperatura.COLUMN_NAME_IDCULTURA,IDCultura);
 
         getWritableDatabase().insert(DataBaseConfig.HumidadeTemperatura.TABLE_NAME,null,values);
     }
 
-    public void insert_Alertas(int idAlerta,String dataMedicao,double valorMedicao,String horaMedicao,String nomeVariavel,String alerta){
+    public void insert_Alertas(int idAlerta,String datahoraMedicao,double valorMedicao,String nomeVariavel,String tipoAlerta){
         ContentValues values = new ContentValues();
         values.put(DataBaseConfig.Alertas.COLUMN_NAME_IDALERTA,idAlerta);
-        values.put(DataBaseConfig.Alertas.COLUMN_NAME_DATAMEDICAO,dataMedicao);
+        values.put(DataBaseConfig.Alertas.COLUMN_NAME_DATAHORAMEDICAO,datahoraMedicao);
         values.put(DataBaseConfig.Alertas.COLUMN_NAME_VALORMEDICAO,valorMedicao);
-        values.put(DataBaseConfig.Alertas.COLUMN_NAME_HORAMEDICAO,horaMedicao);
-        values.put(DataBaseConfig.Alertas.COLUMN_NAME_NOMEVARIAVEL,nomeVariavel);
-        values.put(DataBaseConfig.Alertas.COLUMN_NAME_ALERTAS,alerta);
+        values.put(DataBaseConfig.Alertas.COLUMN_NAME_IDCULTURA,nomeVariavel);
+        values.put(DataBaseConfig.Alertas.COLUMN_NAME_TIPOALERTAS,tipoAlerta);
         getWritableDatabase().insert(DataBaseConfig.Alertas.TABLE_NAME,null,values);
-
-
     }
 
-    public void insert_Cultura(int idCultura,String nomeCultura){
+    public void insert_Cultura(int idCultura,String nomeCultura,double limSupTemp, double limInfTemp, double limSupHumi, double limInfHumi){
         ContentValues values = new ContentValues();
         values.put(DataBaseConfig.Cultura.COLUMN_NAME_IDCULTURA,idCultura);
         values.put(DataBaseConfig.Cultura.COLUMN_NAME_NOMECULTURA,nomeCultura);
+        values.put(DataBaseConfig.Cultura.COLUMN_NAME_LIMITE_SUP_TEMP,limSupTemp);
+        values.put(DataBaseConfig.Cultura.COLUMN_NAME_LIMITE_INF_TEMP,limInfTemp);
+        values.put(DataBaseConfig.Cultura.COLUMN_NAME_LIMITE_SUP_HUMI,limSupHumi);
+        values.put(DataBaseConfig.Cultura.COLUMN_NAME_LIMITE_INF_HUMI,limInfHumi);
         getWritableDatabase().insert(DataBaseConfig.Cultura.TABLE_NAME,null,values);
     }
 
