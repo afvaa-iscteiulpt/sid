@@ -5,14 +5,22 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import inducesmile.com.sid.Connection.ConnectionHandler;
 import inducesmile.com.sid.DataBase.DataBaseHandler;
@@ -31,16 +39,15 @@ public class MainActivity extends AppCompatActivity {
     //info for download data from sybase
     public static final String READ_HUMIDADE_TEMPERATURA = "http://" + IP + ":" + PORT + "/getHumidade_Temperatura.php";
     public static final String READ_ALERTAS = "http://" + IP + ":" + PORT + "/getAlertas.php";
-    public static final String READ_Cultura = "http://" + IP + ":" + PORT + "/getCultura.php";
+    public static final String READ_CULTURA = "http://" + IP + ":" + PORT + "/getCultura.php";
     private int spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        fetchCulturasParaSpinner();
         db.dbClear();
+        fetchCulturasParaSpinner();
     }
 
     public void drawGraph(View v){
@@ -55,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fetchCulturasParaSpinner() {
+        Spinner spinner;
+
         try {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
@@ -62,23 +71,42 @@ public class MainActivity extends AppCompatActivity {
             params.put("username", username);
             params.put("password", password);
             ConnectionHandler jParser = new ConnectionHandler();
-            JSONArray jsonHumidadeTemperatura = jParser.getJSONFromUrl(READ_HUMIDADE_TEMPERATURA, params);
-            db.dbClear();
 
-            JSONArray jsonCultura = jParser.getJSONFromUrl(READ_Cultura,params);
+            JSONArray jsonCultura = jParser.getJSONFromUrl(READ_CULTURA,params);
+            spinner = (Spinner) findViewById(R.id.spinner);
+            List<String> list = new ArrayList<String>();
             if (jsonCultura!=null){
                 for (int i = 0; i < jsonCultura.length(); i++) {
                     JSONObject c = jsonCultura.getJSONObject(i);
                     int idCultura = c.getInt("idCultura");
-                    String nomeCultura = c.getString("NomeCultura");
-                    
-                }
+                    String nomeCultura = c.getString("nomeCultura");
+                    Log.d("Mensagem", idCultura + ": " + nomeCultura);
+                    list.add(nomeCultura);
 
+                }
+                ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+                        android.R.layout.simple_spinner_item, list);
+                dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinner.setAdapter(dataAdapter);
             }
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public void addListenerOnSpinnerItemSelection() {
+        /*Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        spinner.setOnItemSelectedListener(OnItemSelectedListener {
+            public void onItemSelected(AdapterView<?> parent, View view, int pos,long id) {
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // TODO Auto-generated method stub
+            }
+        });*/
     }
 
     public void refreshDB(View v){
@@ -181,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
 
-            JSONArray jsonCultura = jParser.getJSONFromUrl(READ_Cultura,params);
+            JSONArray jsonCultura = jParser.getJSONFromUrl(READ_CULTURA,params);
             if (jsonCultura!=null){
                 for (int i = 0; i < jsonCultura.length(); i++) {
                     JSONObject c = jsonCultura.getJSONObject(i);

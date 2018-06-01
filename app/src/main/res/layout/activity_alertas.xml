@@ -8,14 +8,14 @@
     tools:context="inducesmile.com.sid.App.AlertasActivity">
 
     <TextView
-        android:id="@+id/nome_cultura_alerta_tv"
+        android:id="@+id/nome_cultura"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="@string/culturaSelectName"
-        android:textAppearance="@android:style/TextAppearance.Material.Medium"
+        android:textAppearance="@android:style/TextAppearance.Material"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -31,7 +31,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/nome_cultura_alerta_tv"
+        app:layout_constraintTop_toBottomOf="@+id/nome_cultura"
         app:layout_constraintVertical_bias="0.19">
 
         <HorizontalScrollView
@@ -57,7 +57,7 @@
                         android:layout_height="match_parent"
                         android:layout_gravity="center_horizontal"
                         android:padding="20dp"
-                        android:text="    Data     "
+                        android:text="Data"
                         android:textStyle="bold" />
 
                     <TextView
@@ -66,7 +66,7 @@
                         android:layout_height="match_parent"
                         android:layout_gravity="center_horizontal"
                         android:padding="20dp"
-                        android:text="  Hora  "
+                        android:text="Hora"
                         android:textStyle="bold"
                         tools:layout_editor_absoluteX="192dp"
                         tools:layout_editor_absoluteY="211dp" />
@@ -77,7 +77,7 @@
                         android:layout_height="match_parent"
                         android:layout_gravity="center_horizontal"
                         android:padding="20dp"
-                        android:text="  Valor  "
+                        android:text="Valor Registo"
                         android:textStyle="bold" />
 
                     <TextView
@@ -86,7 +86,7 @@
                         android:layout_height="match_parent"
                         android:layout_gravity="center_horizontal"
                         android:padding="20dp"
-                        android:text="    Alerta    "
+                        android:text="Tipo Alerta"
                         android:textStyle="bold"
                         tools:layout_editor_absoluteX="199dp"
                         tools:layout_editor_absoluteY="67dp" />

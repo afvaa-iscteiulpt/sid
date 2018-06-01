@@ -43,7 +43,7 @@ public class AlertasActivity extends AppCompatActivity {
             nome = culturaCursor.getString(culturaCursor.getColumnIndex("NomeCultura"));
         }
 
-        TextView tv = findViewById(R.id.nome_cultura_alerta_tv);
+        TextView tv = findViewById(R.id.nome_cultura);
         if (nome!=null){
         tv.setText(nome);}
     }
