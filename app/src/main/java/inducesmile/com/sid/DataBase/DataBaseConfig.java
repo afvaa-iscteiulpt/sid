@@ -18,7 +18,7 @@ public class DataBaseConfig {
     }
 
     public static class Alertas implements BaseColumns{
-        public static final String TABLE_NAME="Alertas";
+        public static final String TABLE_NAME="AlertasHumidadeTemperatura";
         public static final String COLUMN_NAME_IDALERTA="idAlerta";
         public static final String COLUMN_NAME_DATAHORAMEDICAO ="dataHora";
         public static final String COLUMN_NAME_VALORMEDICAO="valorReg";

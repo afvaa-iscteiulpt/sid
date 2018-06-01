@@ -110,14 +110,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void refreshDB(View v){
-        String idCultura = findViewById(spinner).toString();
+        String idCultura = findViewById(R.id.spinner).toString();
         if (idCultura != null){
             copyDataToDBWithCulturaID(idCultura);
-            //idCultura.onEditorAction(EditorInfo.IME_ACTION_DONE);
+
+            /*
+            idCultura.onEditorAction(EditorInfo.IME_ACTION_DONE);
             updateNomeCultura();
             updateNumeroMedicoes();
             updateNumeroAlertas();
-
+            */
         }
     }
 
@@ -181,34 +183,42 @@ public class MainActivity extends AppCompatActivity {
             params.put("password", password);
             params.put("idCultura",idCultura);
             ConnectionHandler jParser = new ConnectionHandler();
-            JSONArray jsonHumidadeTemperatura = jParser.getJSONFromUrl(READ_HUMIDADE_TEMPERATURA, params);
             db.dbClear();
+
+            /*
+            JSONArray jsonHumidadeTemperatura = jParser.getJSONFromUrl(READ_HUMIDADE_TEMPERATURA, params);
             if (jsonHumidadeTemperatura !=null){
                 for (int i = 0; i < jsonHumidadeTemperatura.length(); i++) {
                     JSONObject c = jsonHumidadeTemperatura.getJSONObject(i);
-                    int idMedicao = c.getInt("IDMedicao");
-                    String dataHoraMedicao = c.getString("DataHoraMedicao");
-                    double valorMedicaoTemperatura = c.getDouble("ValorMedicaoTemperatura");
-                    double valorMedicaoHumidade = c.getDouble("ValorMedicaoHumidade");
-                    int idCultura2 = c.getInt("IDCultura");
-                    db.insert_Humidade_Temperatura(idMedicao,idCultura2,dataHoraMedicao,valorMedicaoTemperatura,valorMedicaoHumidade);
+                    int idMedicao = c.getInt("idMedicao");
+                    String dataHoraMedicao = c.getString("dataHoraMedicao");
+                    double valorMedicaoTemperatura = c.getDouble("valorMedicaoTemperatura");
+                    double valorMedicaoHumidade = c.getDouble("valorMedicaoHumidade");
+
+                    db.insert_Humidade_Temperatura(idMedicao,dataHoraMedicao,valorMedicaoTemperatura,valorMedicaoHumidade);
                 }
             }
+            */
 
             JSONArray jsonAlertas = jParser.getJSONFromUrl(READ_ALERTAS,params);
             if (jsonAlertas!=null){
                 for (int i = 0; i < jsonAlertas.length(); i++) {
                     JSONObject c = jsonAlertas.getJSONObject(i);
-                    int IDAlerta = c.getInt("IDAlerta");
-                    String dataMedicao = c.getString("DataHoraMedicao");
-                    double valorMedicao = c.getDouble("ValorMedicao");
-                    String dataHoraMedicao = c.getString("HoraMedicao");
-                    String alerta = c.getString("Alerta");
-                    db.insert_Alertas(IDAlerta,dataMedicao,valorMedicao,dataHoraMedicao,alerta);
+
+                    int idAlerta = c.getInt("idAlerta");
+                    String tipoAlerta = c.getString("tipoAlerta");
+                    String idCulturaResult = c.getString("idCultura");
+                    String dataHoraMedicao = c.getString("dataHora");
+                    String valorReg = c.getString("valorReg");
+
+                    db.insert_Alertas(idAlerta,dataHoraMedicao,Double.valueOf(valorReg),idCulturaResult,tipoAlerta);
                 }
 
             }
 
+            Log.d("msg", "ok");
+
+            /*
             JSONArray jsonCultura = jParser.getJSONFromUrl(READ_CULTURA,params);
             if (jsonCultura!=null){
                 for (int i = 0; i < jsonCultura.length(); i++) {
@@ -222,6 +232,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
             }
+            */
 
         } catch (JSONException e) {
             e.printStackTrace();

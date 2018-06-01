@@ -55,11 +55,11 @@ public class AlertasActivity extends AppCompatActivity {
             TableRow row = new TableRow(this);
             row.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
             TextView nomeVariavel = new TextView(this);
-            nomeVariavel.setText(alertasCursor.getString(alertasCursor.getColumnIndex("NomeVariavel")));
+            nomeVariavel.setText(alertasCursor.getString(alertasCursor.getColumnIndex("nomeVariavel")));
             nomeVariavel.setPadding(dpAsPixels(16),dpAsPixels(5),0,0);
 
             TextView data = new TextView(this);
-            data.setText(alertasCursor.getString(alertasCursor.getColumnIndex("DataMedicao")));
+            data.setText(alertasCursor.getString(alertasCursor.getColumnIndex("dataHora")));
             data.setPadding(dpAsPixels(16),dpAsPixels(5),0,0);
 
             TextView hora = new TextView(this);
