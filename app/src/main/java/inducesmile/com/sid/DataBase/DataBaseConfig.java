@@ -10,30 +10,30 @@ public class DataBaseConfig {
 
     public static class HumidadeTemperatura implements BaseColumns {
         public static final String TABLE_NAME = "HumidadeTemperatura";
-        public static final String COLUMN_NAME_IDMEDICAO = "IDMedicao";
-        public static final String COLUMN_NAME_DATAHORAMEDICAO = "DataHoraMedicao";
-        public static final String COLUMN_NAME_VALORMEDICAOTEMPERATURA = "ValorMedicaoTemperatura";
-        public static final String COLUMN_NAME_VALORMEDICAOHUMIDADE = "ValorMedicaoHumidade";
+        public static final String COLUMN_NAME_IDMEDICAO = "idMedicao";
+        public static final String COLUMN_NAME_DATAHORAMEDICAO = "dataHoraMedicao";
+        public static final String COLUMN_NAME_VALORMEDICAOTEMPERATURA = "valorMedicaoTemperatura";
+        public static final String COLUMN_NAME_VALORMEDICAOHUMIDADE = "valorMedicaoHumidade";
 
     }
 
     public static class Alertas implements BaseColumns{
         public static final String TABLE_NAME="Alertas";
-        public static final String COLUMN_NAME_IDALERTA="IDAlerta";
-        public static final String COLUMN_NAME_DATAHORAMEDICAO ="DataMedicao";
-        public static final String COLUMN_NAME_VALORMEDICAO="ValorMedicao";
-        public static final String COLUMN_NAME_IDCULTURA ="NomeVariavel";
-        public static final String COLUMN_NAME_TIPOALERTAS ="Alertas";
+        public static final String COLUMN_NAME_IDALERTA="idAlerta";
+        public static final String COLUMN_NAME_DATAHORAMEDICAO ="dataHora";
+        public static final String COLUMN_NAME_VALORMEDICAO="valorReg";
+        public static final String COLUMN_NAME_IDCULTURA ="idCultura";
+        public static final String COLUMN_NAME_TIPOALERTAS ="tipoAlerta";
     }
 
     public static class Cultura implements BaseColumns{
         public static final String TABLE_NAME="Cultura";
-        public static final String COLUMN_NAME_IDCULTURA="IDCultura";
-        public static final String COLUMN_NAME_NOMECULTURA="NomeCultura";
-        public static final String COLUMN_NAME_LIMITE_SUP_TEMP="LimiteSuperiorTemperatura";
-        public static final String COLUMN_NAME_LIMITE_INF_TEMP="LimiteInferiorTemperatura";
-        public static final String COLUMN_NAME_LIMITE_SUP_HUMI="LimiteSuperiorHumidade";
-        public static final String COLUMN_NAME_LIMITE_INF_HUMI="LimiteInferiorHumidade";
+        public static final String COLUMN_NAME_IDCULTURA="idCultura";
+        public static final String COLUMN_NAME_NOMECULTURA="nomeCultura";
+        public static final String COLUMN_NAME_LIMITE_SUP_TEMP="limiteSuperiorTemperatura";
+        public static final String COLUMN_NAME_LIMITE_INF_TEMP="limiteInferiorTemperatura";
+        public static final String COLUMN_NAME_LIMITE_SUP_HUMI="limiteSuperiorHumidade";
+        public static final String COLUMN_NAME_LIMITE_INF_HUMI="limiteInferiorHumidade";
     }
 
 
