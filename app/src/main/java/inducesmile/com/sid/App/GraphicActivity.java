@@ -219,4 +219,8 @@ public class GraphicActivity extends AppCompatActivity {
         return horaForGraph;
     }
 
+    public void backToMainView(View v) {
+        finish();
+    }
+
 }

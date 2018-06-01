@@ -213,4 +213,8 @@ public class AlertasActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+    public void backToMainView(View v) {
+        finish();
+    }
 }
