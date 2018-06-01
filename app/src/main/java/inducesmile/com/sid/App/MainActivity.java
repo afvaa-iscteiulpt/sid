@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void refreshDB(View v){
-        String idCultura = findViewById(R.id.spinner).toString();
+        String idCultura = this.findViewById(R.id.spinner).toString();
         if (idCultura != null){
             copyDataToDBWithCulturaID(idCultura);
 

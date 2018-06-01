@@ -1,10 +1,13 @@
 package inducesmile.com.sid.App;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -12,8 +15,14 @@ import android.widget.TextView;
 
 import inducesmile.com.sid.DataBase.DataBaseHandler;
 import inducesmile.com.sid.DataBase.DataBaseReader;
+import inducesmile.com.sid.Helper.UserLogin;
 import inducesmile.com.sid.R;
 import android.view.View.OnClickListener;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+
 public class AlertasActivity extends AppCompatActivity {
 
     DataBaseHandler db = new DataBaseHandler(this);
@@ -60,58 +69,113 @@ public class AlertasActivity extends AppCompatActivity {
 
             TextView idAlerta = new TextView(this);
             idAlerta.setText(alertasCursor.getString(alertasCursor.getColumnIndex("idAlerta")));
-            idAlerta.setPadding(dpAsPixels(16),dpAsPixels(5),0,0);
+            idAlerta.setPadding(dpAsPixels(5), dpAsPixels(5), 0,dpAsPixels(5));
 
             TextView dataHora = new TextView(this);
             dataHora.setText(alertasCursor.getString(alertasCursor.getColumnIndex("dataHora")));
-            dataHora.setPadding(dpAsPixels(16),dpAsPixels(5),0,0);
+            dataHora.setPadding(dpAsPixels(5), dpAsPixels(5), 0,dpAsPixels(5));
 
+            String alertidCultura = alertasCursor.getString(alertasCursor.getColumnIndex("idCultura"));
+            if(alertidCultura.isEmpty() || alertidCultura.equals("null")) {
+                alertidCultura = "-";
+            }
             TextView idCultura = new TextView(this);
-            idCultura.setText(alertasCursor.getString(alertasCursor.getColumnIndex("idCultura")));
-            idCultura.setPadding(dpAsPixels(16),dpAsPixels(5),0,0);
+            idCultura.setText(alertidCultura);
+            idCultura.setPadding(dpAsPixels(5), dpAsPixels(5), 0,dpAsPixels(5));
 
+            String alertValorRegText = alertasCursor.getString(alertasCursor.getColumnIndex("valorReg"));
+            if(alertValorRegText.isEmpty() || alertValorRegText.equals("null")) {
+                alertValorRegText = "-";
+            }
             TextView valorReg = new TextView(this);
-            valorReg.setText(alertasCursor.getString(alertasCursor.getColumnIndex("valorReg")));
-            valorReg.setPadding(dpAsPixels(16),dpAsPixels(5),0,0);
+            valorReg.setText(alertValorRegText);
+            valorReg.setPadding(dpAsPixels(5), dpAsPixels(5), 0,dpAsPixels(5));
 
             TextView tipoAlerta = new TextView(this);
             tipoAlerta.setText(alertasCursor.getString(alertasCursor.getColumnIndex("tipoAlerta")));
-            tipoAlerta.setPadding(dpAsPixels(16),dpAsPixels(5),0,0);
+            tipoAlerta.setPadding(dpAsPixels(5), dpAsPixels(5), 0,dpAsPixels(5));
 
-            row.addView(idAlerta);
-            row.addView(dataHora);
-            row.addView(idCultura);
-            row.addView(valorReg);
             row.addView(tipoAlerta);
+            row.addView(valorReg);
+            row.addView(idCultura);
+            row.addView(dataHora);
+            row.addView(idAlerta);
 
-            row.setBackgroundColor(Color.GREEN);
             row.setClickable(true);
 
+            checkIfIsNewAlert(row, alertasCursor.getString(alertasCursor.getColumnIndex("idAlerta")));
 
             row.setOnClickListener(new OnClickListener() {
                 public void onClick(View v) {
-                    v.setBackgroundColor(Color.GRAY);
-                    System.out.println("Row clicked: " + v.getId());
 
-                    /*
-                    //get the data you need
-                    TableRow tablerow = (TableRow)v.getParent();
-                    TextView sample = (TextView) tablerow.getChildAt(2);
-                    String result=sample.getText().toString();
-                    */
+                    v.setBackgroundColor(Color.TRANSPARENT);
+
+                    TableRow tablerow = (TableRow) v;
+                    TextView rowView = (TextView) tablerow.getChildAt(4);
+                    String idAlerta = rowView.getText().toString();
+
+                    addToAlertReadMemory(idAlerta);
                 }
             });
-
 
             table.addView(row, new TableLayout.LayoutParams(TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
         }
     }
 
-private int dpAsPixels(int dp){
-    float scale = getResources().getDisplayMetrics().density;
-    return (int) (dp*scale + 0.5f);
+    private void checkIfIsNewAlert(TableRow row, String idAlerta) {
 
-}
+        SharedPreferences alertAlreadyRead;
+        alertAlreadyRead = getSharedPreferences("alertAlreadyRead", MODE_PRIVATE);
+        String alertIds = alertAlreadyRead.getString("alertIds", "");
 
+        //string to list
+        ArrayList<String> list = new ArrayList<String>();
+        for(String s: alertIds.split(",")){
 
+            if(s != idAlerta)
+                list.add(s);
+        }
+
+        if(!list.contains(idAlerta))
+            row.setBackgroundColor(Color.rgb(255,255,153));
+    }
+
+    private void addToAlertReadMemory(String idAlerta) {
+
+        SharedPreferences alertAlreadyRead;
+        alertAlreadyRead = getSharedPreferences("alertAlreadyRead", MODE_PRIVATE);
+        String alertIds = alertAlreadyRead.getString("alertIds", "");
+
+        //string to list
+        ArrayList<String> list = new ArrayList<String>();
+        for(String s: alertIds.split(",")){
+
+            if(s != idAlerta)
+                list.add(s);
+        }
+
+        if(!list.contains(idAlerta))
+            list.add(idAlerta);
+
+        //list to string again to put on sharedpreferences
+        StringBuilder stringB = new StringBuilder();
+        Iterator<?> it = list.iterator();
+
+        while (it.hasNext()) {
+            stringB.append(it.next() + ",");
+        }
+
+        SharedPreferences.Editor editor = alertAlreadyRead.edit();
+        editor.putString("alertIds", stringB.toString());
+        editor.commit();
+    }
+
+    public void mainActivityRefreshDB(View v) {
+
+    }
+
+    private int dpAsPixels(int dp){
+        float scale = getResources().getDisplayMetrics().density;
+        return (int) (dp*scale + 0.5f);
+    }
 }
