@@ -71,6 +71,8 @@ public class DataBaseConfig {
     protected static final String SQL_DELETE_ALERTAS=
             "DROP TABLE IF EXISTS " + Alertas.TABLE_NAME;
 
+    protected static final String SQL_CLEAN_ALERTAS=
+            "DELETE FROM " + Alertas.TABLE_NAME;
 
     protected static final String SQL_DELETE_CULTURA=
             "DROP TABLE IF EXISTS " + Cultura.TABLE_NAME;

@@ -15,7 +15,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "sid.db";
 
     DataBaseConfig config = new DataBaseConfig();
-
+    SQLiteDatabase sqLiteDatabase = null;
 
     public DataBaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -23,6 +23,9 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
+
+        this.sqLiteDatabase = sqLiteDatabase;
+
         sqLiteDatabase.execSQL(config.SQL_CREATE_HUMIDADE_TEMPERATURA);
         sqLiteDatabase.execSQL(config.SQL_CREATE_ALERTAS);
         sqLiteDatabase.execSQL(config.SQL_CREATE_CULTURA);
@@ -44,6 +47,10 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         getWritableDatabase().execSQL(config.SQL_DELETE_ALERTAS);
         getWritableDatabase().execSQL(config.SQL_DELETE_CULTURA);
         onCreate(getWritableDatabase());
+    }
+
+    public void dbClearAlertas() {
+        getWritableDatabase().execSQL(config.SQL_CLEAN_ALERTAS);
     }
 
     public void insert_Humidade_Temperatura(int idMedicao,String datahoraMedicao,double valorMedicaoTemperatura,double valorMedicaoHumidade){

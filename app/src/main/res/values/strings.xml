@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SID Project</string>
+    <string name="app_name">Monitorização de culturas</string>
 
     <string-array name="lista_culturas"></string-array>
 

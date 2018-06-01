@@ -47,15 +47,32 @@ public class MainActivity extends AppCompatActivity {
     private String limInfTemp = "";
     private String limSupHumi = "";
     private String limInfHumi = "";
+    ArrayAdapter<String> dataAdapter = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         db.dbClear();
-        Spinner spinner = (Spinner) findViewById(R.id.spinner);
-        fetchCulturasParaSpinner();
-        addListenerOnSpinnerItemSelection();
+        spinner = (Spinner) findViewById(R.id.spinner);
+        clearInputs();
+        refreshDB(null);
+
+    }
+
+    private void clearInputs() {
+        TextView text = findViewById(R.id.limSupTemp);
+        text.setText("-");
+
+        text = findViewById(R.id.limInfTemp);
+        text.setText("-");
+
+        text = findViewById(R.id.limSupHumi);
+        text.setText("-");
+
+        text = findViewById(R.id.limInfHumi);
+        text.setText("-");
+
     }
 
     public void drawGraph(View v){
@@ -69,46 +86,14 @@ public class MainActivity extends AppCompatActivity {
         startActivity(i);
     }
 
-    private void fetchCulturasParaSpinner() {
-
-        try {
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-            HashMap<String, String> params = new HashMap<>();
-            params.put("username", username);
-            params.put("password", password);
-            ConnectionHandler jParser = new ConnectionHandler();
-
-            JSONArray jsonCultura = jParser.getJSONFromUrl(READ_CULTURA,params);
-            spinner = (Spinner) findViewById(R.id.spinner);
-            List<String> list = new ArrayList<String>();
-            culturasId = new HashMap<>();
-
-            if (jsonCultura!=null){
-                for (int i = 0; i < jsonCultura.length(); i++) {
-                    JSONObject c = jsonCultura.getJSONObject(i);
-                    culturasId.put(i,c.getInt("idCultura"));
-                    list.add(c.getString("nomeCultura"));
-                }
-                ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-                        android.R.layout.simple_spinner_item, list);
-                dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spinner.setAdapter(dataAdapter);
-
-                refreshDB(null);
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void addListenerOnSpinnerItemSelection() {
         spinner = (Spinner) findViewById(R.id.spinner);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 refreshDB(null);
+
+                Log.d("msg", "ola");
             }
 
             @Override
@@ -116,19 +101,30 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
     }
 
     public void refreshDB(View v){
 
-        String idCultura = culturasId.get(spinner.getSelectedItemPosition()).toString();
+        String idCultura = null;
 
-        if (idCultura != null){
-            copyDataToDBWithCulturaID(idCultura);
-
-            updateDadosCultura(idCultura);
-            updateNumeroMedicoes();
-            updateNumeroAlertas();
+        if(culturasId != null) {
+            idCultura = String.valueOf(culturasId.get(spinner.getSelectedItemPosition()));
         }
+
+        Log.d("idcultura",String.valueOf(idCultura));
+
+        if(idCultura != null && !idCultura.equals("null")) {
+            updateDadosCultura(idCultura);
+            copyDataToDBWithCulturaID(idCultura);
+        } else {
+            copyDataToDBWithCulturaID("null");
+
+            clearInputs();
+        }
+
+        updateNumeroMedicoes();
+        updateNumeroAlertas();
     }
 
     private void updateDadosCultura(String idCultura) {
@@ -162,6 +158,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
+
     public void updateNumeroMedicoes(){
 
         DataBaseReader dbReader = new DataBaseReader(db);
@@ -184,6 +182,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //bug - quando arranca chama duas vezes esta função , não é grave. Os pedidos restantes funcionam sem problemas.
     public void copyDataToDBWithCulturaID(String idCultura) {
         try {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -228,20 +227,39 @@ public class MainActivity extends AppCompatActivity {
 
             Log.d("msg", "ok");
 
-            /*
+            spinner = (Spinner) findViewById(R.id.spinner);
+            List<String> list = new ArrayList<String>();
+            list.add(" - ");
+            culturasId = new HashMap<>();
+            culturasId.put(0,null);
+
             JSONArray jsonCultura = jParser.getJSONFromUrl(READ_CULTURA,params);
             if (jsonCultura!=null){
-                for (int i = 0; i < jsonCultura.length(); i++) {
+                for (int i = 1; i < jsonCultura.length(); i++) {
+
                     JSONObject c = jsonCultura.getJSONObject(i);
+
+                    culturasId.put(i,c.getInt("idCultura"));
+                    list.add(c.getString("nomeCultura"));
+
                     String nomeCultura = c.getString("nomeCultura");
                     double limSupTempCultura = c.getDouble("limiteSuperiorTemperatura");
                     double limInfTempCultura = c.getDouble("limiteInferiorTemperatura");
                     double limSupHumiCultura = c.getDouble("limiteSuperiorHumidade");
                     double limInfHumiCultura = c.getDouble("limiteInferiorHumidade");
-                    db.insert_Cultura(Integer.parseInt(idCultura),nomeCultura,limSupTempCultura,limInfTempCultura,limSupHumiCultura,limInfHumiCultura);
+                    db.insert_Cultura(c.getInt("idCultura"),nomeCultura,limSupTempCultura,limInfTempCultura,limSupHumiCultura,limInfHumiCultura);
                 }
+
+                //only updates the select box on statup
+                if(dataAdapter == null) {
+                    dataAdapter = new ArrayAdapter<String>(this,
+                            android.R.layout.simple_spinner_item, list);
+                    dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    spinner.setAdapter(dataAdapter);
+                    addListenerOnSpinnerItemSelection();
+                }
+
             }
-            */
 
         } catch (JSONException e) {
             e.printStackTrace();

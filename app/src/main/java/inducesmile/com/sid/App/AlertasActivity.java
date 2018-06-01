@@ -5,27 +5,36 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import inducesmile.com.sid.Connection.ConnectionHandler;
 import inducesmile.com.sid.DataBase.DataBaseHandler;
 import inducesmile.com.sid.DataBase.DataBaseReader;
 import inducesmile.com.sid.Helper.UserLogin;
 import inducesmile.com.sid.R;
 import android.view.View.OnClickListener;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
 public class AlertasActivity extends AppCompatActivity {
 
     DataBaseHandler db = new DataBaseHandler(this);
+    Spinner spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +42,6 @@ public class AlertasActivity extends AppCompatActivity {
         setContentView(R.layout.activity_alertas);
         Cursor alertasCursor= getAlertasCursor();
         Cursor culturaCursor = getCulturaCursor();
-        updateNomeCultura(culturaCursor);
         listAlertas(alertasCursor);
     }
 
@@ -48,16 +56,6 @@ public class AlertasActivity extends AppCompatActivity {
         DataBaseReader dbReader = new DataBaseReader(db);
         Cursor cursor = dbReader.readAlertas();
         return cursor;
-    }
-    private void updateNomeCultura(Cursor culturaCursor){
-        String nome=null;
-        while (culturaCursor.moveToNext()){
-            nome = culturaCursor.getString(culturaCursor.getColumnIndex("NomeCultura"));
-        }
-
-        TextView tv = findViewById(R.id.nome_cultura);
-        if (nome!=null){
-        tv.setText(nome);}
     }
 
     private void listAlertas(Cursor alertasCursor){
@@ -171,11 +169,48 @@ public class AlertasActivity extends AppCompatActivity {
     }
 
     public void mainActivityRefreshDB(View v) {
+        spinner = (Spinner) findViewById(R.id.spinner);
+        //String idCultura = culturasId.get(spinner.getSelectedItemPosition()).toString();
+
+        copyDataToDBWithCulturaID("");
+        listAlertas(getAlertasCursor());
 
     }
 
     private int dpAsPixels(int dp){
         float scale = getResources().getDisplayMetrics().density;
         return (int) (dp*scale + 0.5f);
+    }
+
+    public void copyDataToDBWithCulturaID(String idCultura) {
+        try {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+            HashMap<String, String> params = new HashMap<>();
+            params.put("username", UserLogin.getInstance().getUsername());
+            params.put("password", UserLogin.getInstance().getPassword());
+            params.put("idCultura",idCultura);
+            ConnectionHandler jParser = new ConnectionHandler();
+            db.dbClearAlertas();
+
+            JSONArray jsonAlertas = jParser.getJSONFromUrl(MainActivity.READ_ALERTAS,params);
+            if (jsonAlertas!=null){
+                for (int i = 0; i < jsonAlertas.length(); i++) {
+                    JSONObject c = jsonAlertas.getJSONObject(i);
+
+                    int idAlerta = c.getInt("idAlerta");
+                    String tipoAlerta = c.getString("tipoAlerta");
+                    String idCulturaResult = c.getString("idCultura");
+                    String dataHoraMedicao = c.getString("dataHora");
+                    String valorReg = c.getString("valorReg");
+
+                    db.insert_Alertas(idAlerta,dataHoraMedicao,Double.valueOf(valorReg),idCulturaResult,tipoAlerta);
+                }
+
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }
