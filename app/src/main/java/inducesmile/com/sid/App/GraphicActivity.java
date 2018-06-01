@@ -26,15 +26,20 @@ import inducesmile.com.sid.R;
 
 public class GraphicActivity extends AppCompatActivity {
 
-DataBaseHandler db = new DataBaseHandler(this);
-GraphView graph;
-DataBaseReader reader;
-int year;
-int month;
-int day;
-String yearString;
-String monthString;
-String dayString;
+    private DataBaseHandler db = new DataBaseHandler(this);
+    private GraphView graph;
+    private DataBaseReader reader;
+    private int year;
+    private int month;
+    private int day;
+    private String yearString;
+    private String monthString;
+    private String dayString;
+
+    private static class Meses {
+        private static final String JANEIRO = "Janeiro";
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +81,7 @@ String dayString;
 
     }
     private void transformDateString(){
-        TextView text = findViewById(R.id.graphicDate);
+        TextView text = findViewById(R.id.dataAtual);
         text.setText(yearString +"-"+monthString+"-"+dayString);
     }
 
@@ -85,7 +90,7 @@ String dayString;
         //To do, ir à base de dados buscar o cursor do dia selecionado.
 
         reader = new DataBaseReader(db);
-        Cursor cursor = reader.ReadHumidadeTemperatura("DataMedicao='"+yearString+"-"+monthString+"-"+dayString+"'");
+        Cursor cursor = reader.ReadHumidadeTemperatura("dataHoraMedicao='"+yearString+"-"+monthString+"-"+dayString+"'");
         return cursor;
     }
 
@@ -108,10 +113,10 @@ String dayString;
 
         //Ir a cada entrada, converter os minutos para decimais e por no grafico
         while(cursor.moveToNext()) {
-            Integer dataTemperatura = cursor.getInt(cursor.getColumnIndex("ValorMedicaoTemperatura"));
-            Integer dataHumidade = cursor.getInt(cursor.getColumnIndex("ValorMedicaoHumidade"));
+            Integer dataTemperatura = cursor.getInt(cursor.getColumnIndex("valorMedicaoTemperatura"));
+            Integer dataHumidade = cursor.getInt(cursor.getColumnIndex("valorMedicaoHumidade"));
 
-            String horaString = cursor.getString(cursor.getColumnIndex("HoraMedicao"));
+            String horaString = cursor.getString(cursor.getColumnIndex("dataHoraMedicao"));
             double horaForGraph = convertHourStringToDouble(horaString);
 
             if (helper==0)
@@ -149,7 +154,6 @@ String dayString;
         graph.getViewport().setXAxisBoundsManual(true);
         graph.getViewport().setMinX(first_value);
         graph.getViewport().setMaxX(last_value);
-
 
         graph.getViewport().setScalable(true);
         graph.getViewport().setScalableY(true);
