@@ -10,9 +10,6 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,6 +38,14 @@ public class MainActivity extends AppCompatActivity {
     public static final String READ_ALERTAS = "http://" + IP + ":" + PORT + "/getAlertas.php";
     public static final String READ_CULTURA = "http://" + IP + ":" + PORT + "/getCultura.php";
     private int spinner;
+    private HashMap<Integer, Integer> culturasId;
+
+    private String nomeCultura = "";
+    private int idCultura = -1;
+    private double limSupTemp = 0;
+    private double limInfTemp = 0;
+    private double limSupHumi = 0;
+    private double limInfHumi = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         db.dbClear();
         fetchCulturasParaSpinner();
+        updateDadosCultura();
     }
 
     public void drawGraph(View v){
@@ -75,19 +81,20 @@ public class MainActivity extends AppCompatActivity {
             JSONArray jsonCultura = jParser.getJSONFromUrl(READ_CULTURA,params);
             spinner = (Spinner) findViewById(R.id.spinner);
             List<String> list = new ArrayList<String>();
+            culturasId = new HashMap<>();
+
             if (jsonCultura!=null){
                 for (int i = 0; i < jsonCultura.length(); i++) {
                     JSONObject c = jsonCultura.getJSONObject(i);
-                    int idCultura = c.getInt("idCultura");
-                    String nomeCultura = c.getString("nomeCultura");
-                    Log.d("Mensagem", idCultura + ": " + nomeCultura);
-                    list.add(nomeCultura);
-
+                    culturasId.put(i,c.getInt("idCultura"));
+                    list.add(c.getString("nomeCultura"));
                 }
                 ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
                         android.R.layout.simple_spinner_item, list);
                 dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinner.setAdapter(dataAdapter);
+
+                updateDadosCultura();
             }
 
         } catch (JSONException e) {
@@ -96,30 +103,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void addListenerOnSpinnerItemSelection() {
-        /*Spinner spinner = (Spinner) findViewById(R.id.spinner);
-        spinner.setOnItemSelectedListener(OnItemSelectedListener {
-            public void onItemSelected(AdapterView<?> parent, View view, int pos,long id) {
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> arg0) {
-                // TODO Auto-generated method stub
-            }
-        });*/
+        refreshDB(null);
     }
 
     public void refreshDB(View v){
-        String idCultura = findViewById(R.id.spinner).toString();
+        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        String idCultura = culturasId.get(spinner.getSelectedItemPosition()).toString();
         if (idCultura != null){
             copyDataToDBWithCulturaID(idCultura);
 
-            /*
-            idCultura.onEditorAction(EditorInfo.IME_ACTION_DONE);
-            updateNomeCultura();
             updateNumeroMedicoes();
             updateNumeroAlertas();
-            */
         }
     }
 
@@ -148,8 +142,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void updateNomeCultura(){
+    private void updateDadosCultura(){
 
+        refreshDB(null);
         //To do?
         /*DataBaseReader dbReader = new DataBaseReader(db);
 
@@ -185,7 +180,6 @@ public class MainActivity extends AppCompatActivity {
             ConnectionHandler jParser = new ConnectionHandler();
             db.dbClear();
 
-            /*
             JSONArray jsonHumidadeTemperatura = jParser.getJSONFromUrl(READ_HUMIDADE_TEMPERATURA, params);
             if (jsonHumidadeTemperatura !=null){
                 for (int i = 0; i < jsonHumidadeTemperatura.length(); i++) {
@@ -198,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
                     db.insert_Humidade_Temperatura(idMedicao,dataHoraMedicao,valorMedicaoTemperatura,valorMedicaoHumidade);
                 }
             }
-            */
+
 
             JSONArray jsonAlertas = jParser.getJSONFromUrl(READ_ALERTAS,params);
             if (jsonAlertas!=null){
@@ -218,21 +212,19 @@ public class MainActivity extends AppCompatActivity {
 
             Log.d("msg", "ok");
 
-            /*
             JSONArray jsonCultura = jParser.getJSONFromUrl(READ_CULTURA,params);
             if (jsonCultura!=null){
                 for (int i = 0; i < jsonCultura.length(); i++) {
                     JSONObject c = jsonCultura.getJSONObject(i);
-                    String nomeCultura = c.getString("NomeCultura");
-                    double limSupTempCultura = c.getDouble("LimiteSuperiorTemperatura");
-                    double limInfTempCultura = c.getDouble("LimiteInferiorTemperatura");
-                    double limSupHumiCultura = c.getDouble("LimiteSuperiorHumidade");
-                    double limInfHumiCultura = c.getDouble("LimiteInferiorHumidade");
+                    String nomeCultura = c.getString("nomeCultura");
+                    double limSupTempCultura = c.getDouble("limiteSuperiorTemperatura");
+                    double limInfTempCultura = c.getDouble("limiteInferiorTemperatura");
+                    double limSupHumiCultura = c.getDouble("limiteSuperiorHumidade");
+                    double limInfHumiCultura = c.getDouble("limiteInferiorHumidade");
                     db.insert_Cultura(Integer.parseInt(idCultura),nomeCultura,limSupTempCultura,limInfTempCultura,limSupHumiCultura,limInfHumiCultura);
                 }
-
             }
-            */
+
 
         } catch (JSONException e) {
             e.printStackTrace();
