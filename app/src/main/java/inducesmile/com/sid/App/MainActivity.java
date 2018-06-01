@@ -119,7 +119,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void refreshDB(View v){
+
         String idCultura = culturasId.get(spinner.getSelectedItemPosition()).toString();
+
         if (idCultura != null){
             copyDataToDBWithCulturaID(idCultura);
 
