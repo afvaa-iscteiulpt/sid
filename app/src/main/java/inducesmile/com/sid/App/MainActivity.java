@@ -7,6 +7,7 @@ import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -37,23 +38,24 @@ public class MainActivity extends AppCompatActivity {
     public static final String READ_HUMIDADE_TEMPERATURA = "http://" + IP + ":" + PORT + "/getHumidade_Temperatura.php";
     public static final String READ_ALERTAS = "http://" + IP + ":" + PORT + "/getAlertas.php";
     public static final String READ_CULTURA = "http://" + IP + ":" + PORT + "/getCultura.php";
-    private int spinner;
+    private Spinner spinner;
     private HashMap<Integer, Integer> culturasId;
 
     private String nomeCultura = "";
     private int idCultura = -1;
-    private double limSupTemp = 0;
-    private double limInfTemp = 0;
-    private double limSupHumi = 0;
-    private double limInfHumi = 0;
+    private String limSupTemp = "";
+    private String limInfTemp = "";
+    private String limSupHumi = "";
+    private String limInfHumi = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         db.dbClear();
+        Spinner spinner = (Spinner) findViewById(R.id.spinner);
         fetchCulturasParaSpinner();
-        updateDadosCultura();
+        addListenerOnSpinnerItemSelection();
     }
 
     public void drawGraph(View v){
@@ -68,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fetchCulturasParaSpinner() {
-        Spinner spinner;
 
         try {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -94,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
                 dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinner.setAdapter(dataAdapter);
 
-                updateDadosCultura();
+                refreshDB(null);
             }
 
         } catch (JSONException e) {
@@ -103,71 +104,83 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void addListenerOnSpinnerItemSelection() {
-        refreshDB(null);
+        spinner = (Spinner) findViewById(R.id.spinner);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                refreshDB(null);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
     }
 
     public void refreshDB(View v){
-        Spinner spinner = (Spinner) findViewById(R.id.spinner);
         String idCultura = culturasId.get(spinner.getSelectedItemPosition()).toString();
         if (idCultura != null){
             copyDataToDBWithCulturaID(idCultura);
 
+            updateDadosCultura(idCultura);
             updateNumeroMedicoes();
             updateNumeroAlertas();
         }
     }
 
-    public void updateNumeroMedicoes(){
+    private void updateDadosCultura(String idCultura) {
+        DataBaseReader dbReader = new DataBaseReader(db);
+        Cursor cursor = dbReader.readCultura();
 
-        //To Do
+        while (cursor.moveToNext()){
+            if (cursor.getInt(cursor.getColumnIndex("idCultura")) == Integer.parseInt(idCultura)) {
+                this.idCultura = Integer.parseInt(idCultura);
+                nomeCultura = cursor.getString(cursor.getColumnIndex("nomeCultura"));
+                limSupTemp = cursor.getString(cursor.getColumnIndex("limiteSuperiorTemperatura"));
+                limInfTemp = cursor.getString(cursor.getColumnIndex("limiteInferiorTemperatura"));
+                limSupHumi = cursor.getString(cursor.getColumnIndex("limiteSuperiorHumidade"));
+                limInfHumi = cursor.getString(cursor.getColumnIndex("limiteInferiorHumidade"));
+            }
+        }
+
+        TextView text = findViewById(R.id.limSupTemp);
+        text.setText(limSupTemp);
+
+        text = findViewById(R.id.limInfTemp);
+        text.setText(limInfTemp);
+
+        text = findViewById(R.id.limSupHumi);
+        text.setText(limSupHumi);
+
+        text = findViewById(R.id.limInfHumi);
+        text.setText(limInfHumi);
+
+        Log.d("Message", idCultura);
+    }
+
+
+    public void updateNumeroMedicoes(){
 
         DataBaseReader dbReader = new DataBaseReader(db);
 
-        Cursor cursor = dbReader.ReadHumidadeTemperatura(null);
+        Cursor cursor = dbReader.ReadHumidadeTemperatura("idMedicao");
         int totalMedicoes = cursor.getCount();
-        TextView text = findViewById(R.id.numeroMedicoesInt);
+        TextView text = findViewById(R.id.totalMedicoes);
         text.setText(Integer.toString(totalMedicoes));
 
     }
 
     public void updateNumeroAlertas(){
 
-        //To Do
         DataBaseReader dbReader = new DataBaseReader(db);
 
         Cursor cursor = dbReader.readAlertas();
         int totalAlertas = cursor.getCount();
-        TextView text = findViewById(R.id.numeroAlertasInt);
+        TextView text = findViewById(R.id.totalAlertas);
         text.setText(Integer.toString(totalAlertas));
 
     }
-
-    private void updateDadosCultura(){
-
-        refreshDB(null);
-        //To do?
-        /*DataBaseReader dbReader = new DataBaseReader(db);
-
-        TextView nomeCultura_tv= findViewById(R.id.nomeCultura_tv);
-        Cursor cursor = dbReader.readCultura();
-        String nomeCultura=null;
-        while (cursor.moveToNext()){
-            nomeCultura = cursor.getString(cursor.getColumnIndex("NomeCultura"));
-        }
-
-        if (nomeCultura!=null){
-            nomeCultura_tv.setText(nomeCultura);
-            nomeCultura_tv.setTextColor(Color.BLACK);
-        }
-        else{
-            nomeCultura_tv.setText("Cultura Invalida!");
-            nomeCultura_tv.setTextColor(Color.RED);
-        }
-
-        nomeCultura_tv.setVisibility(View.VISIBLE);*/
-    }
-
-//A minha base de dados pode não ser exatamente igual à vossa ou podem concluir que é melhor implementar isto de outra maneira, para mudarem a base de dados no android usem as classes DatabaseConfig(criação) e DatabaseHandler(escrita)
 
     public void copyDataToDBWithCulturaID(String idCultura) {
         try {

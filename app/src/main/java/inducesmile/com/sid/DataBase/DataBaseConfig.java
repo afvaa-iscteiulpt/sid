@@ -39,7 +39,7 @@ public class DataBaseConfig {
 
     protected static final String SQL_CREATE_HUMIDADE_TEMPERATURA =
             "CREATE TABLE " + HumidadeTemperatura.TABLE_NAME +
-                    " (" + HumidadeTemperatura.COLUMN_NAME_IDMEDICAO + " INTEGER PRIMARY KEY," +
+                    " (" + HumidadeTemperatura.COLUMN_NAME_IDMEDICAO + " INTEGER," +
                     HumidadeTemperatura.COLUMN_NAME_DATAHORAMEDICAO + " DATETIME," +
                     HumidadeTemperatura.COLUMN_NAME_VALORMEDICAOTEMPERATURA + " REAL," +
                     HumidadeTemperatura.COLUMN_NAME_VALORMEDICAOHUMIDADE + " REAL)";
@@ -47,7 +47,7 @@ public class DataBaseConfig {
 
     protected static final String SQL_CREATE_ALERTAS =
             "CREATE TABLE " + Alertas.TABLE_NAME +
-                    " (" + Alertas.COLUMN_NAME_IDALERTA + " INTEGER PRIMARY KEY," +
+                    " (" + Alertas.COLUMN_NAME_IDALERTA + " INTEGER," +
                     Alertas.COLUMN_NAME_DATAHORAMEDICAO + " DATETIME," +
                     Alertas.COLUMN_NAME_VALORMEDICAO + " REAL," +
                     Alertas.COLUMN_NAME_IDCULTURA + " INTEGER, "+
@@ -56,7 +56,7 @@ public class DataBaseConfig {
 
     protected static final String SQL_CREATE_CULTURA=
             "CREATE TABLE " + Cultura.TABLE_NAME +
-                    " (" + Cultura.COLUMN_NAME_IDCULTURA + " INTEGER PRIMARY KEY," +
+                    " (" + Cultura.COLUMN_NAME_IDCULTURA + " INTEGER," +
                     Cultura.COLUMN_NAME_NOMECULTURA + " TEXT," +
                     Cultura.COLUMN_NAME_LIMITE_SUP_TEMP + " REAL," +
                     Cultura.COLUMN_NAME_LIMITE_INF_TEMP + " REAL," +
