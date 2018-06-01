@@ -23,6 +23,7 @@ import java.util.List;
 import inducesmile.com.sid.Connection.ConnectionHandler;
 import inducesmile.com.sid.DataBase.DataBaseHandler;
 import inducesmile.com.sid.DataBase.DataBaseReader;
+import inducesmile.com.sid.Helper.Alert;
 import inducesmile.com.sid.Helper.UserLogin;
 import inducesmile.com.sid.R;
 
@@ -164,9 +165,11 @@ public class MainActivity extends AppCompatActivity {
 
         DataBaseReader dbReader = new DataBaseReader(db);
 
+        TextView text = findViewById(R.id.totalMedicoes);
+        text.setText(Integer.toString(0));
+
         Cursor cursor = dbReader.ReadHumidadeTemperatura("idMedicao");
         int totalMedicoes = cursor.getCount();
-        TextView text = findViewById(R.id.totalMedicoes);
         text.setText(Integer.toString(totalMedicoes));
 
     }
@@ -175,9 +178,11 @@ public class MainActivity extends AppCompatActivity {
 
         DataBaseReader dbReader = new DataBaseReader(db);
 
+        TextView text = findViewById(R.id.totalAlertas);
+        text.setText(Integer.toString(0));
+
         Cursor cursor = dbReader.readAlertas();
         int totalAlertas = cursor.getCount();
-        TextView text = findViewById(R.id.totalAlertas);
         text.setText(Integer.toString(totalAlertas));
 
     }
