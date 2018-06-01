@@ -71,7 +71,7 @@ public class AlertasActivity extends AppCompatActivity {
 
 
             TextView valor = new TextView(this);
-            valor.setText(Double.toString(alertasCursor.getDouble(alertasCursor.getColumnIndex("valorMedicao"))));
+            valor.setText(Double.toString(alertasCursor.getDouble(alertasCursor.getColumnIndex("ValorMedicao"))));
             valor.setPadding(dpAsPixels(16),dpAsPixels(5),0,0);
 
             TextView alerta = new TextView(this);

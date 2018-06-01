@@ -5,10 +5,4 @@
 
     <string name="culturaSelectID">0</string>
     <string name="culturaSelectName">Default</string>
-
-    <String name="culturaLimSupTemp"></String>
-    <String name="culturaLimInfTemp"></String>
-    <String name="culturaLimSupHumi"></String>
-    <String name="culturaLimInfHumi"></String>
-
 </resources>
