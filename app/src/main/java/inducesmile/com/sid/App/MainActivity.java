@@ -199,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
             ConnectionHandler jParser = new ConnectionHandler();
             db.dbClear();
 
-            /*
+
             JSONArray jsonHumidadeTemperatura = jParser.getJSONFromUrl(READ_HUMIDADE_TEMPERATURA, params);
             if (jsonHumidadeTemperatura !=null){
                 for (int i = 0; i < jsonHumidadeTemperatura.length(); i++) {
@@ -212,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
                     db.insert_Humidade_Temperatura(idMedicao,dataHoraMedicao,valorMedicaoTemperatura,valorMedicaoHumidade);
                 }
             }
-            */
+
 
             JSONArray jsonAlertas = jParser.getJSONFromUrl(READ_ALERTAS,params);
             if (jsonAlertas!=null){
