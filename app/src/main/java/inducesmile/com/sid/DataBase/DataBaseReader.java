@@ -71,6 +71,20 @@ public class DataBaseReader {
         return cursor;
     }
 
+    public Cursor readCultura(String idCultura){
+        //To do
+        Cursor cursor = db.query(
+                DataBaseConfig.Cultura.TABLE_NAME,   // Nome da tabela
+                null,
+                "idCultura=?",
+                new String[]{idCultura},
+                null,
+                null,
+                null
+        );
+        return cursor;
+    }
+
 
 
 }

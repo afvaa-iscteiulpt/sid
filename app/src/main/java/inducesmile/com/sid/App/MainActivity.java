@@ -42,6 +42,10 @@ public class MainActivity extends AppCompatActivity {
     public static final String READ_CULTURA = "http://" + IP + ":" + PORT + "/getCultura.php";
     private int spinner;
 
+    private HashMap<Integer, Integer> culturas;
+    private int currentCulturaId = -1;
+    private String currentCulturaName = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,19 +79,19 @@ public class MainActivity extends AppCompatActivity {
             JSONArray jsonCultura = jParser.getJSONFromUrl(READ_CULTURA,params);
             spinner = (Spinner) findViewById(R.id.spinner);
             List<String> list = new ArrayList<String>();
+            culturas = new HashMap<>();
+
             if (jsonCultura!=null){
                 for (int i = 0; i < jsonCultura.length(); i++) {
                     JSONObject c = jsonCultura.getJSONObject(i);
-                    int idCultura = c.getInt("idCultura");
-                    String nomeCultura = c.getString("nomeCultura");
-                    Log.d("Mensagem", idCultura + ": " + nomeCultura);
-                    list.add(nomeCultura);
-
+                    culturas.put(i,c.getInt("idCultura"));
+                    list.add(c.getString("nomeCultura"));
                 }
                 ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
                         android.R.layout.simple_spinner_item, list);
                 dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinner.setAdapter(dataAdapter);
+                updateCulturaSelecionada();
             }
 
         } catch (JSONException e) {
@@ -95,31 +99,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void updateCulturaSelecionada() {
+        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        currentCulturaId = culturas.get(spinner.getSelectedItemPosition());
+        currentCulturaName = spinner.getSelectedItem().toString();
+    }
+
     public void addListenerOnSpinnerItemSelection() {
-        /*Spinner spinner = (Spinner) findViewById(R.id.spinner);
-        spinner.setOnItemSelectedListener(OnItemSelectedListener {
-            public void onItemSelected(AdapterView<?> parent, View view, int pos,long id) {
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> arg0) {
-                // TODO Auto-generated method stub
-            }
-        });*/
+        updateCulturaSelecionada();
+        refreshDB(null);
     }
 
     public void refreshDB(View v){
-        String idCultura = findViewById(R.id.spinner).toString();
-        if (idCultura != null){
-            copyDataToDBWithCulturaID(idCultura);
 
-            /*
-            idCultura.onEditorAction(EditorInfo.IME_ACTION_DONE);
+        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        if (spinner != null){
+            copyDataToDBWithCulturaID(culturas.get(spinner.getSelectedItemPosition()).toString());
             updateNomeCultura();
             updateNumeroMedicoes();
             updateNumeroAlertas();
-            */
         }
     }
 
@@ -151,25 +149,13 @@ public class MainActivity extends AppCompatActivity {
     private void updateNomeCultura(){
 
         //To do?
-        /*DataBaseReader dbReader = new DataBaseReader(db);
+        DataBaseReader dbReader = new DataBaseReader(db);
 
-        TextView nomeCultura_tv= findViewById(R.id.nomeCultura_tv);
-        Cursor cursor = dbReader.readCultura();
-        String nomeCultura=null;
+        Cursor cursor = dbReader.readCultura(currentCulturaName);
         while (cursor.moveToNext()){
-            nomeCultura = cursor.getString(cursor.getColumnIndex("NomeCultura"));
+
         }
 
-        if (nomeCultura!=null){
-            nomeCultura_tv.setText(nomeCultura);
-            nomeCultura_tv.setTextColor(Color.BLACK);
-        }
-        else{
-            nomeCultura_tv.setText("Cultura Invalida!");
-            nomeCultura_tv.setTextColor(Color.RED);
-        }
-
-        nomeCultura_tv.setVisibility(View.VISIBLE);*/
     }
 
 //A minha base de dados pode não ser exatamente igual à vossa ou podem concluir que é melhor implementar isto de outra maneira, para mudarem a base de dados no android usem as classes DatabaseConfig(criação) e DatabaseHandler(escrita)
@@ -190,10 +176,12 @@ public class MainActivity extends AppCompatActivity {
             if (jsonHumidadeTemperatura !=null){
                 for (int i = 0; i < jsonHumidadeTemperatura.length(); i++) {
                     JSONObject c = jsonHumidadeTemperatura.getJSONObject(i);
+
                     int idMedicao = c.getInt("idMedicao");
                     String dataHoraMedicao = c.getString("dataHoraMedicao");
                     double valorMedicaoTemperatura = c.getDouble("valorMedicaoTemperatura");
                     double valorMedicaoHumidade = c.getDouble("valorMedicaoHumidade");
+
 
                     db.insert_Humidade_Temperatura(idMedicao,dataHoraMedicao,valorMedicaoTemperatura,valorMedicaoHumidade);
                 }
