@@ -1,6 +1,5 @@
 package inducesmile.com.sid.App;
 
-import android.app.DialogFragment;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -8,8 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.TextView;
 
 import com.jjoe64.graphview.DefaultLabelFormatter;
@@ -35,10 +32,9 @@ public class GraphicActivity extends AppCompatActivity {
     private String yearString;
     private String monthString;
     private String dayString;
+    private String monthNameString;
 
-    private static class Meses {
-        private static final String JANEIRO = "Janeiro";
-    }
+    private String[] months = {"","Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"};
 
 
     @Override
@@ -59,7 +55,7 @@ public class GraphicActivity extends AppCompatActivity {
             day = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
         }
         dateToString();
-        transformDateString();
+        insertDateString();
         Cursor cursor = getCursor();
         drawGraph(cursor);
     }
@@ -67,6 +63,7 @@ public class GraphicActivity extends AppCompatActivity {
 
     private void dateToString(){
         yearString = Integer.toString(year);
+        monthNameString = months[month];
         if (month<10){
             monthString="0"+Integer.toString(month);
         }else{
@@ -80,29 +77,41 @@ public class GraphicActivity extends AppCompatActivity {
         }
 
     }
-    private void transformDateString(){
+    private void insertDateString(){
         TextView text = findViewById(R.id.dataAtual);
-        text.setText(yearString +"-"+monthString+"-"+dayString);
+        text.setText(dayString +" de "+monthNameString+" de "+yearString);
     }
 
-    public Cursor getCursor(){
-
-        //To do, ir à base de dados buscar o cursor do dia selecionado.
-
+    public Cursor getCursor() {
         reader = new DataBaseReader(db);
-        Cursor cursor = reader.ReadHumidadeTemperatura("dataHoraMedicao='"+yearString+"-"+monthString+"-"+dayString+"'");
+        Cursor cursor = reader.ReadHumidadeTemperatura("dataHoraMedicao ='"+yearString+"-"+monthString+"-"+dayString+" 23:59:59.999'");
         return cursor;
     }
 
 
-//A parte do dia selecionado no calendario ser guardado nas variáveis necessárias nesta classe já está feito, não precisam de mexer em nada referente ao calendário a não ser que queiram melhorar o que eu fiz.
+    //A parte do dia selecionado no calendario ser guardado nas variáveis necessárias nesta classe já está feito, não precisam de mexer em nada referente ao calendário a não ser que queiram melhorar o que eu fiz.
     public void showDatePicker(View v){
         Intent intent = new Intent(GraphicActivity.this,DatePickerActivitiy.class);
         startActivity(intent);
         finish();
     }
 
-//Para o gráfico ser desenhado precisam de pelo menos dois valores num dia (é um grafico de linhas), ou seja o cursor entregue a esta função tem de ter registos em duas alturas diferentes no mesmo dia, se quiserem desenhar so com um valor têm de alterar o grafico para um grafico de pontos, este é o link da api que eu usei http://www.android-graphview.org//
+    public void goToToday(View v) {
+        year = Calendar.getInstance().get(Calendar.YEAR);
+        month = Calendar.getInstance().get(Calendar.MONTH)+1;
+        day = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+
+        dateToString();
+        insertDateString();
+        Cursor cursor = getCursor();
+        drawGraph(cursor);
+    }
+
+    public void backToMainView(View v){
+        finish();
+    }
+
+    //Para o gráfico ser desenhado precisam de pelo menos dois valores num dia (é um grafico de linhas), ou seja o cursor entregue a esta função tem de ter registos em duas alturas diferentes no mesmo dia, se quiserem desenhar so com um valor têm de alterar o grafico para um grafico de pontos, este é o link da api que eu usei http://www.android-graphview.org//
     private void drawGraph(Cursor cursor){
         int helper = 0;
         double first_value=0.0;
@@ -217,10 +226,6 @@ public class GraphicActivity extends AppCompatActivity {
         String minutosFormatted = minutosConverted.substring(0,Math.min(minutosConverted.length(),2));
         String horaForGraph = hora+":"+minutosFormatted;
         return horaForGraph;
-    }
-
-    public void backToMainView(View v) {
-        finish();
     }
 
 }
