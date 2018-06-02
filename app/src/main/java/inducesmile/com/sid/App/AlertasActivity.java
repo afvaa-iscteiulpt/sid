@@ -18,6 +18,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import inducesmile.com.sid.Connection.ConnectionHandler;
+import inducesmile.com.sid.Connection.FetchDataFromURL;
 import inducesmile.com.sid.DataBase.DataBaseHandler;
 import inducesmile.com.sid.DataBase.DataBaseReader;
 import inducesmile.com.sid.Helper.UserLogin;
@@ -178,7 +179,7 @@ public class AlertasActivity extends AppCompatActivity {
         spinner = (Spinner) findViewById(R.id.spinner);
         //String idCultura = culturasId.get(spinner.getSelectedItemPosition()).toString();
 
-        copyDataToDBWithCulturaID("");
+        FetchDataFromURL.copyDataToDBWithCulturaID(this);
         listAlertas(getAlertasCursor());
 
     }
@@ -188,39 +189,6 @@ public class AlertasActivity extends AppCompatActivity {
         return (int) (dp*scale + 0.5f);
     }
 
-    public void copyDataToDBWithCulturaID(String idCultura) {
-        try {
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-            HashMap<String, String> params = new HashMap<>();
-            params.put("username", UserLogin.getInstance().getUsername());
-            params.put("password", UserLogin.getInstance().getPassword());
-            params.put("idCultura",idCultura);
-            ConnectionHandler jParser = new ConnectionHandler();
-            db.dbClearAlertas();
-
-            JSONArray jsonAlertas = jParser.getJSONFromUrl(MainActivity.READ_ALERTAS,params);
-            if (jsonAlertas!=null){
-                for (int i = 0; i < jsonAlertas.length(); i++) {
-                    JSONObject c = jsonAlertas.getJSONObject(i);
-
-                    int idAlerta = c.getInt("idAlerta");
-                    String tipoAlerta = c.getString("tipoAlerta");
-                    String idCulturaResult = c.getString("idCultura");
-                    String dataHoraMedicao = c.getString("dataHora");
-                    String valorReg = c.getString("valorReg");
-
-                    db.insert_Alertas(idAlerta,dataHoraMedicao,Double.valueOf(valorReg),idCulturaResult,tipoAlerta);
-                }
-
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-
     private void resetReadedAlertas() {
         SharedPreferences alertAlreadyRead;
         alertAlreadyRead = getSharedPreferences("alertAlreadyRead", MODE_PRIVATE);
@@ -228,7 +196,6 @@ public class AlertasActivity extends AppCompatActivity {
         editor.putString("alertIds", "");
         editor.commit();
     }
-
 
     public void backToMainView(View v) {
         finish();
