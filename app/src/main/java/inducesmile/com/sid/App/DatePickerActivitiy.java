@@ -22,7 +22,7 @@ public class DatePickerActivitiy extends AppCompatActivity {
         int[] yearMonthDay= new int[3];
 
         yearMonthDay[0] = datePicker.getYear();
-        yearMonthDay[1]= datePicker.getMonth()+1;
+        yearMonthDay[1]= datePicker.getMonth();
         yearMonthDay[2] = datePicker.getDayOfMonth();
 
         Intent intent = new Intent(this,GraphicActivity.class);
