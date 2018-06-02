@@ -50,6 +50,10 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         onCreate(getWritableDatabase());
     }
 
+    public void humiTempClear() {
+        getWritableDatabase().execSQL(config.SQL_DELETE_HUMIDADE_TEMPERATURA);
+    }
+
     public void dbClearAlertas() {
         getWritableDatabase().execSQL(config.SQL_CLEAN_ALERTAS);
     }

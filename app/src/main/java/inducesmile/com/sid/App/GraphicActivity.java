@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
+import inducesmile.com.sid.Connection.FetchDataFromURL;
 import inducesmile.com.sid.DataBase.DataBaseConfig;
 import inducesmile.com.sid.DataBase.DataBaseHandler;
 import inducesmile.com.sid.DataBase.DataBaseReader;
@@ -55,6 +56,8 @@ public class GraphicActivity extends AppCompatActivity {
         if (getIntent().hasExtra("date")){
             int[] yearMonthDay = getIntent().getIntArrayExtra("date");
             selectedDate.set(yearMonthDay[0],yearMonthDay[1],yearMonthDay[2]);
+            DateFormat dataFormat = new SimpleDateFormat("yyyy-MM-dd");
+            FetchDataFromURL.updateGraphValues(this,dataFormat.format(selectedDate.getTime()));
             updateDates();
         }
         else {
@@ -94,7 +97,7 @@ public class GraphicActivity extends AppCompatActivity {
         endDate.add(Calendar.DAY_OF_MONTH,1);
 
         if (scale == 0) {
-            beginDate.add(Calendar.DAY_OF_MONTH, -6);
+            beginDate.add(Calendar.DAY_OF_MONTH, -1);
         }
         else if (scale == 2) {
             beginDate.set(selectedDate.get(Calendar.YEAR),selectedDate.get(Calendar.MONTH),selectedDate.get(Calendar.DAY_OF_MONTH),
@@ -161,6 +164,13 @@ public class GraphicActivity extends AppCompatActivity {
     }
 
     public void goToToday(View v) {
+        if (selectedDate.get(Calendar.DAY_OF_MONTH) != Calendar.getInstance().get(Calendar.DAY_OF_MONTH) ||
+                selectedDate.get(Calendar.MONTH) != Calendar.getInstance().get(Calendar.MONTH) ||
+                selectedDate.get(Calendar.YEAR) != Calendar.getInstance().get(Calendar.YEAR)) {
+            DateFormat dataFormat = new SimpleDateFormat("yyyy-MM-dd");
+            FetchDataFromURL.updateGraphValues(this,dataFormat.format(Calendar.getInstance().getTime()));
+        }
+
         selectedDate = null;
         selectedDate = Calendar.getInstance();
         scale = 1;
@@ -219,6 +229,7 @@ public class GraphicActivity extends AppCompatActivity {
 
             Date dateTime = new Date();
             DateFormat dataFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
             try {
                 dateTime = dataFormat.parse(dataHoraString);
             } catch (ParseException e) {
@@ -271,14 +282,13 @@ public class GraphicActivity extends AppCompatActivity {
         if (scale == 0) {
             Calendar middleDate = Calendar.getInstance();
             middleDate.set(beginDate.get(Calendar.YEAR),beginDate.get(Calendar.MONTH),beginDate.get(Calendar.DAY_OF_MONTH),0,0,0);
-            middleDate.add(Calendar.DAY_OF_MONTH,3);
 
             staticLabelsFormatter.setHorizontalLabels(new String[] {
                     beginDate.get(Calendar.DAY_OF_MONTH)+ "/" +(beginDate.get(Calendar.MONTH)+1),
                     middleDate.get(Calendar.DAY_OF_MONTH)+ "/" +(middleDate.get(Calendar.MONTH)+1),
                     endDate.get(Calendar.DAY_OF_MONTH)+ "/" +(endDate.get(Calendar.MONTH)+1)});
         }
-        else if (scale == 1) staticLabelsFormatter.setHorizontalLabels(new String[] {"6h","12h","18h"});
+        else if (scale == 1) staticLabelsFormatter.setHorizontalLabels(new String[] {"0h","6h","12h","18h"});
         else {
             Calendar middleHour = Calendar.getInstance();
             middleHour.set(beginDate.get(Calendar.YEAR),beginDate.get(Calendar.MONTH),beginDate.get(Calendar.DAY_OF_MONTH),0,0,0);
