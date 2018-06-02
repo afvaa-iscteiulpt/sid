@@ -10,7 +10,6 @@ import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.LegendRenderer;
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
@@ -20,6 +19,7 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -49,7 +49,6 @@ public class GraphicActivity extends AppCompatActivity {
 
         if (getIntent().hasExtra("date")){
             int[] yearMonthDay = getIntent().getIntArrayExtra("date");
-            Log.d("data atual", yearMonthDay[0] + "-" + yearMonthDay[1] + "-" + yearMonthDay[2]);
             selectedDate.set(yearMonthDay[0],yearMonthDay[1],yearMonthDay[2]);
         }
         else selectedDate = Calendar.getInstance();
@@ -63,10 +62,9 @@ public class GraphicActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 scale = i;
-                Cursor cursor = getCursor();
                 seriesTemperatura.resetData(generateTemperatura());
                 seriesHumidade.resetData(generateHumidade());
-                Log.d("update scale", String.valueOf(scale));
+                setGraphScale();
             }
 
             @Override
@@ -104,11 +102,13 @@ public class GraphicActivity extends AppCompatActivity {
     }
 
     public void goToToday(View v) {
+        selectedDate = null;
         selectedDate = Calendar.getInstance();
 
         insertDateString();
-        Cursor cursor = getCursor();
-        //drawGraph(cursor);
+        seriesTemperatura.resetData(generateTemperatura());
+        seriesHumidade.resetData(generateHumidade());
+        setGraphScale();
     }
 
     public void backToMainView(View v){
@@ -135,11 +135,9 @@ public class GraphicActivity extends AppCompatActivity {
             } catch (ParseException e) {
                 Log.e("DateTime message", "Parsing ISO8601 datetime failed", e);
             }
-
             datapointsTemperatura[helper] = new DataPoint(dateTime, dataTemperatura);
             helper++;
         }
-
         return datapointsTemperatura;
     }
 
@@ -167,7 +165,6 @@ public class GraphicActivity extends AppCompatActivity {
             datapointsHumidade[helper] = new DataPoint(dateTime, dataHumidade);
             helper++;
         }
-
         return datapointsHumidade;
     }
 
@@ -182,7 +179,7 @@ public class GraphicActivity extends AppCompatActivity {
         seriesTemperatura.setTitle("Temperatura");
         seriesHumidade.setTitle("Humidade");
         graph.getLegendRenderer().setVisible(true);
-        graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.BOTTOM);
+        graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
         graph.getLegendRenderer().setBackgroundColor(Color.alpha(0));
     }
 
@@ -196,10 +193,13 @@ public class GraphicActivity extends AppCompatActivity {
         else if (scale == 1) beginDate.add(Calendar.DAY_OF_MONTH, -1);
         else beginDate.add(Calendar.HOUR_OF_DAY, -1);
 
-        // set manual x bounds to have nice steps
+        graph.getViewport().setXAxisBoundsManual(true);
         graph.getViewport().setMinX(beginDate.getTime().getTime());
         graph.getViewport().setMaxX(selectedDate.getTime().getTime());
-        graph.getViewport().setXAxisBoundsManual(true);
+
+        graph.getViewport().setYAxisBoundsManual(true);
+        graph.getViewport().setMinY(0);
+        graph.getViewport().setMaxY(100);
 
         // as we use dates as labels, the human rounding to nice readable numbers
         // is not necessary

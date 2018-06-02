@@ -27,6 +27,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         this.sqLiteDatabase = sqLiteDatabase;
 
         sqLiteDatabase.execSQL(config.SQL_CREATE_HUMIDADE_TEMPERATURA);
+        sqLiteDatabase.execSQL(config.SQL_CREATE_INDEX_HUMITEMP);
         sqLiteDatabase.execSQL(config.SQL_CREATE_ALERTAS);
         sqLiteDatabase.execSQL(config.SQL_CREATE_CULTURA);
     }

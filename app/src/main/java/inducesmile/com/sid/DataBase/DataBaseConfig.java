@@ -44,6 +44,9 @@ public class DataBaseConfig {
                     HumidadeTemperatura.COLUMN_NAME_VALORMEDICAOTEMPERATURA + " REAL," +
                     HumidadeTemperatura.COLUMN_NAME_VALORMEDICAOHUMIDADE + " REAL)";
 
+    protected static final String SQL_CREATE_INDEX_HUMITEMP =
+            "CREATE INDEX INDEX_HUMITEMP ON " + HumidadeTemperatura.TABLE_NAME + " (" +
+                    HumidadeTemperatura.COLUMN_NAME_IDMEDICAO + ")";
 
     protected static final String SQL_CREATE_ALERTAS =
             "CREATE TABLE " + Alertas.TABLE_NAME +
