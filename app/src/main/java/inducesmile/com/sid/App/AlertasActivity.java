@@ -43,6 +43,9 @@ public class AlertasActivity extends AppCompatActivity {
         Cursor alertasCursor= getAlertasCursor();
         Cursor culturaCursor = getCulturaCursor();
         listAlertas(alertasCursor);
+
+        //call to reset readed alerts
+        //resetReadedAlertas();
     }
 
     public Cursor getCulturaCursor(){
@@ -164,7 +167,7 @@ public class AlertasActivity extends AppCompatActivity {
         }
 
         SharedPreferences.Editor editor = alertAlreadyRead.edit();
-        editor.putString("alertIds", stringB.toString());
+        editor.putString("alertIds", "");
         editor.commit();
     }
 
@@ -213,6 +216,16 @@ public class AlertasActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+
+    private void resetReadedAlertas() {
+        SharedPreferences alertAlreadyRead;
+        alertAlreadyRead = getSharedPreferences("alertAlreadyRead", MODE_PRIVATE);
+        SharedPreferences.Editor editor = alertAlreadyRead.edit();
+        editor.putString("alertIds", "");
+        editor.commit();
+    }
+
 
     public void backToMainView(View v) {
         finish();
