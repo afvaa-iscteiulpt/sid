@@ -160,6 +160,8 @@ public class MainActivity extends AppCompatActivity {
             i++;
         }
 
+        cursor.close();
+
         if(dataAdapter == null || list.size() != dataAdapter.getCount()) {
             dataAdapter = new ArrayAdapter<String>(this,
                     android.R.layout.simple_spinner_item, list);
@@ -183,6 +185,8 @@ public class MainActivity extends AppCompatActivity {
                 limInfHumi = cursor.getString(cursor.getColumnIndex("limiteInferiorHumidade"));
             }
         }
+
+        cursor.close();
 
         TextView text = findViewById(R.id.limSupTemp);
         text.setText(limSupTemp);
@@ -209,7 +213,7 @@ public class MainActivity extends AppCompatActivity {
         Cursor cursor = dbReader.ReadHumidadeTemperatura();
         int totalMedicoes = cursor.getCount();
         text.setText(Integer.toString(totalMedicoes));
-
+        cursor.close();
     }
 
     public void updateNumeroAlertas(){
@@ -222,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
         Cursor cursor = dbReader.readAlertas();
         int totalAlertas = cursor.getCount();
         text.setText(Integer.toString(totalAlertas));
-
+        cursor.close();
     }
 
 }

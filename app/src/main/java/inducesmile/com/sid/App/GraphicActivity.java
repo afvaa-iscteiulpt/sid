@@ -117,6 +117,19 @@ public class GraphicActivity extends AppCompatActivity {
         seekBar.setProgress(scale);
         seekBar.refreshDrawableState();
 
+        if (graph.getSeries().size() == 0 && temp.length != 0) {
+            seriesTemperatura = new LineGraphSeries<>(temp);
+            seriesTemperatura.setColor(Color.RED);
+            seriesTemperatura.setTitle("Temperatura");
+            graph.addSeries(seriesTemperatura);
+        }
+
+        if (graph.getSeries().size() == 0 && humi.length != 0) {
+            seriesHumidade = new LineGraphSeries<>(humi);
+            seriesHumidade.setTitle("Humidade");
+            graph.addSeries(seriesHumidade);
+        }
+
         if (temp.length != 0) seriesTemperatura.resetData(temp);
         if (humi.length != 0) seriesHumidade.resetData(humi);
 
@@ -261,9 +274,9 @@ public class GraphicActivity extends AppCompatActivity {
             middleDate.add(Calendar.DAY_OF_MONTH,3);
 
             staticLabelsFormatter.setHorizontalLabels(new String[] {
-                    beginDate.get(Calendar.DAY_OF_MONTH)+ "/" +beginDate.get(Calendar.MONTH)+1,
-                    middleDate.get(Calendar.DAY_OF_MONTH)+ "/" +middleDate.get(Calendar.MONTH)+1,
-                    endDate.get(Calendar.DAY_OF_MONTH)+ "/" +endDate.get(Calendar.MONTH)+1});
+                    beginDate.get(Calendar.DAY_OF_MONTH)+ "/" +(beginDate.get(Calendar.MONTH)+1),
+                    middleDate.get(Calendar.DAY_OF_MONTH)+ "/" +(middleDate.get(Calendar.MONTH)+1),
+                    endDate.get(Calendar.DAY_OF_MONTH)+ "/" +(endDate.get(Calendar.MONTH)+1)});
         }
         else if (scale == 1) staticLabelsFormatter.setHorizontalLabels(new String[] {"6h","12h","18h"});
         else {
