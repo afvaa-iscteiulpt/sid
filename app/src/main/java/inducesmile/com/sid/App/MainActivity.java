@@ -39,9 +39,6 @@ public class MainActivity extends AppCompatActivity {
     DataBaseHandler db = new DataBaseHandler(this);
 
     //info for download data from sybase
-    public static final String READ_HUMIDADE_TEMPERATURA = "http://" + IP + ":" + PORT + "/getHumidade_Temperatura.php";
-    public static final String READ_ALERTAS = "http://" + IP + ":" + PORT + "/getAlertas.php";
-    public static final String READ_CULTURA = "http://" + IP + ":" + PORT + "/getCultura.php";
     private Spinner spinner;
     private HashMap<Integer, Integer> culturasId;
 
