@@ -5,25 +5,18 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import inducesmile.com.sid.Connection.ConnectionHandler;
 import inducesmile.com.sid.DataBase.DataBaseHandler;
 import inducesmile.com.sid.DataBase.DataBaseReader;
-import inducesmile.com.sid.Helper.Alert;
 import inducesmile.com.sid.Helper.UserLogin;
 import inducesmile.com.sid.R;
 
@@ -38,42 +31,16 @@ public class MainActivity extends AppCompatActivity {
     //info for download data from sybase
     public static final String READ_HUMIDADE_TEMPERATURA = "http://" + IP + ":" + PORT + "/getHumidade_Temperatura.php";
     public static final String READ_ALERTAS = "http://" + IP + ":" + PORT + "/getAlertas.php";
-    public static final String READ_CULTURA = "http://" + IP + ":" + PORT + "/getCultura.php";
-    private Spinner spinner;
-    private HashMap<Integer, Integer> culturasId;
-
-    private String nomeCultura = "";
-    private int idCultura = -1;
-    private String limSupTemp = "";
-    private String limInfTemp = "";
-    private String limSupHumi = "";
-    private String limInfHumi = "";
-    ArrayAdapter<String> dataAdapter = null;
+    public static final String READ_Cultura = "http://" + IP + ":" + PORT + "/getCultura.php";
+    private int spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        fetchCulturasParaSpinner();
         db.dbClear();
-        spinner = (Spinner) findViewById(R.id.spinner);
-        clearInputs();
-        refreshDB(null);
-
-    }
-
-    private void clearInputs() {
-        TextView text = findViewById(R.id.limSupTemp);
-        text.setText("-");
-
-        text = findViewById(R.id.limInfTemp);
-        text.setText("-");
-
-        text = findViewById(R.id.limSupHumi);
-        text.setText("-");
-
-        text = findViewById(R.id.limInfHumi);
-        text.setText("-");
-
     }
 
     public void drawGraph(View v){
@@ -87,107 +54,96 @@ public class MainActivity extends AppCompatActivity {
         startActivity(i);
     }
 
-    public void addListenerOnSpinnerItemSelection() {
-        spinner = (Spinner) findViewById(R.id.spinner);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                refreshDB(null);
+    private void fetchCulturasParaSpinner() {
+        try {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+            HashMap<String, String> params = new HashMap<>();
+            params.put("username", username);
+            params.put("password", password);
+            ConnectionHandler jParser = new ConnectionHandler();
+            JSONArray jsonHumidadeTemperatura = jParser.getJSONFromUrl(READ_HUMIDADE_TEMPERATURA, params);
+            db.dbClear();
 
-                Log.d("msg", "ola");
+            JSONArray jsonCultura = jParser.getJSONFromUrl(READ_Cultura,params);
+            if (jsonCultura!=null){
+                for (int i = 0; i < jsonCultura.length(); i++) {
+                    JSONObject c = jsonCultura.getJSONObject(i);
+                    int idCultura = c.getInt("idCultura");
+                    String nomeCultura = c.getString("NomeCultura");
+                    
+                }
+
             }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public void refreshDB(View v){
-
-        String idCultura = null;
-
-        if(culturasId != null) {
-            idCultura = String.valueOf(culturasId.get(spinner.getSelectedItemPosition()));
-        }
-
-        Log.d("idcultura",String.valueOf(idCultura));
-
-        if(idCultura != null && !idCultura.equals("null")) {
-            updateDadosCultura(idCultura);
+        String idCultura = findViewById(spinner).toString();
+        if (idCultura != null){
             copyDataToDBWithCulturaID(idCultura);
-        } else {
-            copyDataToDBWithCulturaID("null");
+            //idCultura.onEditorAction(EditorInfo.IME_ACTION_DONE);
+            updateNomeCultura();
+            updateNumeroMedicoes();
+            updateNumeroAlertas();
 
-            clearInputs();
         }
-
-        updateNumeroMedicoes();
-        updateNumeroAlertas();
     }
-
-    private void updateDadosCultura(String idCultura) {
-        DataBaseReader dbReader = new DataBaseReader(db);
-        Cursor cursor = dbReader.readCultura();
-
-        while (cursor.moveToNext()){
-            if (cursor.getInt(cursor.getColumnIndex("idCultura")) == Integer.parseInt(idCultura)) {
-                this.idCultura = Integer.parseInt(idCultura);
-                nomeCultura = cursor.getString(cursor.getColumnIndex("nomeCultura"));
-                limSupTemp = cursor.getString(cursor.getColumnIndex("limiteSuperiorTemperatura"));
-                limInfTemp = cursor.getString(cursor.getColumnIndex("limiteInferiorTemperatura"));
-                limSupHumi = cursor.getString(cursor.getColumnIndex("limiteSuperiorHumidade"));
-                limInfHumi = cursor.getString(cursor.getColumnIndex("limiteInferiorHumidade"));
-            }
-        }
-
-        TextView text = findViewById(R.id.limSupTemp);
-        text.setText(limSupTemp);
-
-        text = findViewById(R.id.limInfTemp);
-        text.setText(limInfTemp);
-
-        text = findViewById(R.id.limSupHumi);
-        text.setText(limSupHumi);
-
-        text = findViewById(R.id.limInfHumi);
-        text.setText(limInfHumi);
-
-        Log.d("Message", idCultura);
-    }
-
-
-
 
     public void updateNumeroMedicoes(){
 
+        //To Do
+
         DataBaseReader dbReader = new DataBaseReader(db);
 
-        TextView text = findViewById(R.id.totalMedicoes);
-        text.setText(Integer.toString(0));
-
-        Cursor cursor = dbReader.ReadHumidadeTemperatura();
+        Cursor cursor = dbReader.ReadHumidadeTemperatura(null);
         int totalMedicoes = cursor.getCount();
+        TextView text = findViewById(R.id.numeroMedicoesInt);
         text.setText(Integer.toString(totalMedicoes));
 
     }
 
     public void updateNumeroAlertas(){
 
+        //To Do
         DataBaseReader dbReader = new DataBaseReader(db);
-
-        TextView text = findViewById(R.id.totalAlertas);
-        text.setText(Integer.toString(0));
 
         Cursor cursor = dbReader.readAlertas();
         int totalAlertas = cursor.getCount();
+        TextView text = findViewById(R.id.numeroAlertasInt);
         text.setText(Integer.toString(totalAlertas));
 
     }
 
-    //bug - quando arranca chama duas vezes esta função , não é grave. Os pedidos restantes funcionam sem problemas.
+    private void updateNomeCultura(){
+
+        //To do?
+        /*DataBaseReader dbReader = new DataBaseReader(db);
+
+        TextView nomeCultura_tv= findViewById(R.id.nomeCultura_tv);
+        Cursor cursor = dbReader.readCultura();
+        String nomeCultura=null;
+        while (cursor.moveToNext()){
+            nomeCultura = cursor.getString(cursor.getColumnIndex("NomeCultura"));
+        }
+
+        if (nomeCultura!=null){
+            nomeCultura_tv.setText(nomeCultura);
+            nomeCultura_tv.setTextColor(Color.BLACK);
+        }
+        else{
+            nomeCultura_tv.setText("Cultura Invalida!");
+            nomeCultura_tv.setTextColor(Color.RED);
+        }
+
+        nomeCultura_tv.setVisibility(View.VISIBLE);*/
+    }
+
+//A minha base de dados pode não ser exatamente igual à vossa ou podem concluir que é melhor implementar isto de outra maneira, para mudarem a base de dados no android usem as classes DatabaseConfig(criação) e DatabaseHandler(escrita)
+
     public void copyDataToDBWithCulturaID(String idCultura) {
         try {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -197,71 +153,44 @@ public class MainActivity extends AppCompatActivity {
             params.put("password", password);
             params.put("idCultura",idCultura);
             ConnectionHandler jParser = new ConnectionHandler();
-            db.dbClear();
-
-
             JSONArray jsonHumidadeTemperatura = jParser.getJSONFromUrl(READ_HUMIDADE_TEMPERATURA, params);
+            db.dbClear();
             if (jsonHumidadeTemperatura !=null){
                 for (int i = 0; i < jsonHumidadeTemperatura.length(); i++) {
                     JSONObject c = jsonHumidadeTemperatura.getJSONObject(i);
-                    int idMedicao = c.getInt("idMedicao");
-                    String dataHoraMedicao = c.getString("dataHoraMedicao");
-                    double valorMedicaoTemperatura = c.getDouble("valorMedicaoTemperatura");
-                    double valorMedicaoHumidade = c.getDouble("valorMedicaoHumidade");
-
-                    db.insert_Humidade_Temperatura(idMedicao,dataHoraMedicao,valorMedicaoTemperatura,valorMedicaoHumidade);
+                    int idMedicao = c.getInt("IDMedicao");
+                    String dataHoraMedicao = c.getString("DataHoraMedicao");
+                    double valorMedicaoTemperatura = c.getDouble("ValorMedicaoTemperatura");
+                    double valorMedicaoHumidade = c.getDouble("ValorMedicaoHumidade");
+                    int idCultura2 = c.getInt("IDCultura");
+                    db.insert_Humidade_Temperatura(idMedicao,idCultura2,dataHoraMedicao,valorMedicaoTemperatura,valorMedicaoHumidade);
                 }
             }
-
 
             JSONArray jsonAlertas = jParser.getJSONFromUrl(READ_ALERTAS,params);
             if (jsonAlertas!=null){
                 for (int i = 0; i < jsonAlertas.length(); i++) {
                     JSONObject c = jsonAlertas.getJSONObject(i);
-
-                    int idAlerta = c.getInt("idAlerta");
-                    String tipoAlerta = c.getString("tipoAlerta");
-                    String idCulturaResult = c.getString("idCultura");
-                    String dataHoraMedicao = c.getString("dataHora");
-                    String valorReg = c.getString("valorReg");
-
-                    db.insert_Alertas(idAlerta,dataHoraMedicao,Double.valueOf(valorReg),idCulturaResult,tipoAlerta);
+                    int IDAlerta = c.getInt("IDAlerta");
+                    String dataMedicao = c.getString("DataHoraMedicao");
+                    double valorMedicao = c.getDouble("ValorMedicao");
+                    String dataHoraMedicao = c.getString("HoraMedicao");
+                    String alerta = c.getString("Alerta");
+                    db.insert_Alertas(IDAlerta,dataMedicao,valorMedicao,dataHoraMedicao,alerta);
                 }
 
             }
 
-            Log.d("msg", "ok");
-
-            spinner = (Spinner) findViewById(R.id.spinner);
-            List<String> list = new ArrayList<String>();
-            list.add(" - ");
-            culturasId = new HashMap<>();
-            culturasId.put(0,null);
-
-            JSONArray jsonCultura = jParser.getJSONFromUrl(READ_CULTURA,params);
+            JSONArray jsonCultura = jParser.getJSONFromUrl(READ_Cultura,params);
             if (jsonCultura!=null){
-                for (int i = 1; i < jsonCultura.length(); i++) {
-
+                for (int i = 0; i < jsonCultura.length(); i++) {
                     JSONObject c = jsonCultura.getJSONObject(i);
-
-                    culturasId.put(i,c.getInt("idCultura"));
-                    list.add(c.getString("nomeCultura"));
-
-                    String nomeCultura = c.getString("nomeCultura");
-                    double limSupTempCultura = c.getDouble("limiteSuperiorTemperatura");
-                    double limInfTempCultura = c.getDouble("limiteInferiorTemperatura");
-                    double limSupHumiCultura = c.getDouble("limiteSuperiorHumidade");
-                    double limInfHumiCultura = c.getDouble("limiteInferiorHumidade");
-                    db.insert_Cultura(c.getInt("idCultura"),nomeCultura,limSupTempCultura,limInfTempCultura,limSupHumiCultura,limInfHumiCultura);
-                }
-
-                //only updates the select box on statup
-                if(dataAdapter == null) {
-                    dataAdapter = new ArrayAdapter<String>(this,
-                            android.R.layout.simple_spinner_item, list);
-                    dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spinner.setAdapter(dataAdapter);
-                    addListenerOnSpinnerItemSelection();
+                    String nomeCultura = c.getString("NomeCultura");
+                    double limSupTempCultura = c.getDouble("LimiteSuperiorTemperatura");
+                    double limInfTempCultura = c.getDouble("LimiteInferiorTemperatura");
+                    double limSupHumiCultura = c.getDouble("LimiteSuperiorHumidade");
+                    double limInfHumiCultura = c.getDouble("LimiteInferiorHumidade");
+                    db.insert_Cultura(Integer.parseInt(idCultura),nomeCultura,limSupTempCultura,limInfTempCultura,limSupHumiCultura,limInfHumiCultura);
                 }
 
             }

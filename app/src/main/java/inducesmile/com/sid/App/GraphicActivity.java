@@ -1,5 +1,6 @@
 package inducesmile.com.sid.App;
 
+import android.app.DialogFragment;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -7,7 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.SeekBar;
+import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.TextView;
 
 import com.jjoe64.graphview.DefaultLabelFormatter;
@@ -24,20 +26,15 @@ import inducesmile.com.sid.R;
 
 public class GraphicActivity extends AppCompatActivity {
 
-    private DataBaseHandler db = new DataBaseHandler(this);
-    private GraphView graph;
-    private DataBaseReader reader;
-    private int year;
-    private int month;
-    private int day;
-    private String yearString;
-    private String monthString;
-    private String dayString;
-    private String monthNameString;
-    private int scale;
-
-    private String[] months = {"","Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"};
-
+DataBaseHandler db = new DataBaseHandler(this);
+GraphView graph;
+DataBaseReader reader;
+int year;
+int month;
+int day;
+String yearString;
+String monthString;
+String dayString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,37 +54,14 @@ public class GraphicActivity extends AppCompatActivity {
             day = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
         }
         dateToString();
-        insertDateString();
+        transformDateString();
         Cursor cursor = getCursor();
         drawGraph(cursor);
-
-        SeekBar seekBar = (SeekBar)findViewById(R.id.seekBar);
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                scale = i;
-                updateGraph();
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
     }
 
-    private void updateGraph() {
-
-    }
 
     private void dateToString(){
         yearString = Integer.toString(year);
-        monthNameString = months[month];
         if (month<10){
             monthString="0"+Integer.toString(month);
         }else{
@@ -101,41 +75,29 @@ public class GraphicActivity extends AppCompatActivity {
         }
 
     }
-    private void insertDateString(){
-        TextView text = findViewById(R.id.dataAtual);
-        text.setText(dayString +" de "+monthNameString+" de "+yearString);
+    private void transformDateString(){
+        TextView text = findViewById(R.id.graphicDate);
+        text.setText(yearString +"-"+monthString+"-"+dayString);
     }
 
-    public Cursor getCursor() {
+    public Cursor getCursor(){
+
+        //To do, ir à base de dados buscar o cursor do dia selecionado.
+
         reader = new DataBaseReader(db);
-        Cursor cursor = reader.ReadHumidadeTemperatura();
+        Cursor cursor = reader.ReadHumidadeTemperatura("DataMedicao='"+yearString+"-"+monthString+"-"+dayString+"'");
         return cursor;
     }
 
 
-    //A parte do dia selecionado no calendario ser guardado nas variáveis necessárias nesta classe já está feito, não precisam de mexer em nada referente ao calendário a não ser que queiram melhorar o que eu fiz.
+//A parte do dia selecionado no calendario ser guardado nas variáveis necessárias nesta classe já está feito, não precisam de mexer em nada referente ao calendário a não ser que queiram melhorar o que eu fiz.
     public void showDatePicker(View v){
         Intent intent = new Intent(GraphicActivity.this,DatePickerActivitiy.class);
         startActivity(intent);
         finish();
     }
 
-    public void goToToday(View v) {
-        year = Calendar.getInstance().get(Calendar.YEAR);
-        month = Calendar.getInstance().get(Calendar.MONTH)+1;
-        day = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
-
-        dateToString();
-        insertDateString();
-        Cursor cursor = getCursor();
-        drawGraph(cursor);
-    }
-
-    public void backToMainView(View v){
-        finish();
-    }
-
-    //Para o gráfico ser desenhado precisam de pelo menos dois valores num dia (é um grafico de linhas), ou seja o cursor entregue a esta função tem de ter registos em duas alturas diferentes no mesmo dia, se quiserem desenhar so com um valor têm de alterar o grafico para um grafico de pontos, este é o link da api que eu usei http://www.android-graphview.org//
+//Para o gráfico ser desenhado precisam de pelo menos dois valores num dia (é um grafico de linhas), ou seja o cursor entregue a esta função tem de ter registos em duas alturas diferentes no mesmo dia, se quiserem desenhar so com um valor têm de alterar o grafico para um grafico de pontos, este é o link da api que eu usei http://www.android-graphview.org//
     private void drawGraph(Cursor cursor){
         int helper = 0;
         double first_value=0.0;
@@ -144,15 +106,12 @@ public class GraphicActivity extends AppCompatActivity {
         DataPoint[] datapointsTemperatura = new DataPoint[cursor.getCount()];
         DataPoint[] datapointsHumidade = new DataPoint[cursor.getCount()];
 
-        Log.d("Cursor count", String.valueOf(cursor.getCount()));
-
         //Ir a cada entrada, converter os minutos para decimais e por no grafico
         while(cursor.moveToNext()) {
-            Integer dataTemperatura = cursor.getInt(cursor.getColumnIndex("valorMedicaoTemperatura"));
-            Integer dataHumidade = cursor.getInt(cursor.getColumnIndex("valorMedicaoHumidade"));
+            Integer dataTemperatura = cursor.getInt(cursor.getColumnIndex("ValorMedicaoTemperatura"));
+            Integer dataHumidade = cursor.getInt(cursor.getColumnIndex("ValorMedicaoHumidade"));
 
-            String horaString = cursor.getString(cursor.getColumnIndex("dataHoraMedicao"));
-            Log.d("String da BD", horaString);
+            String horaString = cursor.getString(cursor.getColumnIndex("HoraMedicao"));
             double horaForGraph = convertHourStringToDouble(horaString);
 
             if (helper==0)
@@ -191,6 +150,7 @@ public class GraphicActivity extends AppCompatActivity {
         graph.getViewport().setMinX(first_value);
         graph.getViewport().setMaxX(last_value);
 
+
         graph.getViewport().setScalable(true);
         graph.getViewport().setScalableY(true);
         graph.addSeries(seriesTemperatura);
@@ -200,8 +160,7 @@ public class GraphicActivity extends AppCompatActivity {
 
 
     private double convertHourStringToDouble(String horaString){
-        String[] temp = horaString.split(" ");
-        String[] horaMinutos = temp[1].split(":");
+        String[] horaMinutos = horaString.split(":");
         int hora = Integer.parseInt(horaMinutos[0]);
         double minutos = Integer.parseInt(horaMinutos[1]);
 
