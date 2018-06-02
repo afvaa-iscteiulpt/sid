@@ -15,7 +15,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "sid.db";
 
     DataBaseConfig config = new DataBaseConfig();
-
+    SQLiteDatabase sqLiteDatabase = null;
 
     public DataBaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -23,6 +23,9 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
+
+        this.sqLiteDatabase = sqLiteDatabase;
+
         sqLiteDatabase.execSQL(config.SQL_CREATE_HUMIDADE_TEMPERATURA);
         sqLiteDatabase.execSQL(config.SQL_CREATE_ALERTAS);
         sqLiteDatabase.execSQL(config.SQL_CREATE_CULTURA);
@@ -46,7 +49,11 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         onCreate(getWritableDatabase());
     }
 
-    public void insert_Humidade_Temperatura(int idMedicao,int IDCultura,String datahoraMedicao,double valorMedicaoTemperatura,double valorMedicaoHumidade){
+    public void dbClearAlertas() {
+        getWritableDatabase().execSQL(config.SQL_CLEAN_ALERTAS);
+    }
+
+    public void insert_Humidade_Temperatura(int idMedicao,String datahoraMedicao,double valorMedicaoTemperatura,double valorMedicaoHumidade){
         ContentValues values = new ContentValues();
         values.put(DataBaseConfig.HumidadeTemperatura.COLUMN_NAME_IDMEDICAO,idMedicao);
         values.put(DataBaseConfig.HumidadeTemperatura.COLUMN_NAME_DATAHORAMEDICAO,datahoraMedicao);
@@ -56,12 +63,12 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         getWritableDatabase().insert(DataBaseConfig.HumidadeTemperatura.TABLE_NAME,null,values);
     }
 
-    public void insert_Alertas(int idAlerta,String datahoraMedicao,double valorMedicao,String nomeVariavel,String tipoAlerta){
+    public void insert_Alertas(int idAlerta,String datahoraMedicao,double valorMedicao,String idCultura,String tipoAlerta){
         ContentValues values = new ContentValues();
         values.put(DataBaseConfig.Alertas.COLUMN_NAME_IDALERTA,idAlerta);
         values.put(DataBaseConfig.Alertas.COLUMN_NAME_DATAHORAMEDICAO,datahoraMedicao);
         values.put(DataBaseConfig.Alertas.COLUMN_NAME_VALORMEDICAO,valorMedicao);
-        values.put(DataBaseConfig.Alertas.COLUMN_NAME_IDCULTURA,nomeVariavel);
+        values.put(DataBaseConfig.Alertas.COLUMN_NAME_IDCULTURA,idCultura);
         values.put(DataBaseConfig.Alertas.COLUMN_NAME_TIPOALERTAS,tipoAlerta);
         getWritableDatabase().insert(DataBaseConfig.Alertas.TABLE_NAME,null,values);
     }

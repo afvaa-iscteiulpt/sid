@@ -1,16 +1,7 @@
 <resources>
-    <string name="app_name">SID Project</string>
+    <string name="app_name">Monitorização de culturas</string>
 
-    <string-array name="country_arrays">
-        <item>Malaysia</item>
-        <item>United States</item>
-        <item>Indonesia</item>
-        <item>France</item>
-        <item>Italy</item>
-        <item>Singapore</item>
-        <item>New Zealand</item>
-        <item>India</item>
-    </string-array>
+    <string-array name="lista_culturas"></string-array>
 
     <string name="culturaSelectID">0</string>
     <string name="culturaSelectName">Default</string>
