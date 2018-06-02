@@ -66,6 +66,7 @@ public class AlertasActivity extends AppCompatActivity {
     private void listAlertas(Cursor alertasCursor){
 
         TableLayout table = findViewById(R.id.tableAlertas);
+        table.removeAllViews();
         while (alertasCursor.moveToNext()){
             TableRow row = new TableRow(this);
             row.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
