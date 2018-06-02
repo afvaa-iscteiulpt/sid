@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
         TextView text = findViewById(R.id.totalMedicoes);
         text.setText(Integer.toString(0));
 
-        Cursor cursor = dbReader.ReadHumidadeTemperatura("idMedicao");
+        Cursor cursor = dbReader.ReadHumidadeTemperatura();
         int totalMedicoes = cursor.getCount();
         text.setText(Integer.toString(totalMedicoes));
 

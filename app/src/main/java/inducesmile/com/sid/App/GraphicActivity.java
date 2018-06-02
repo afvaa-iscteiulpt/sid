@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.jjoe64.graphview.DefaultLabelFormatter;
@@ -33,6 +34,7 @@ public class GraphicActivity extends AppCompatActivity {
     private String monthString;
     private String dayString;
     private String monthNameString;
+    private int scale;
 
     private String[] months = {"","Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"};
 
@@ -58,8 +60,30 @@ public class GraphicActivity extends AppCompatActivity {
         insertDateString();
         Cursor cursor = getCursor();
         drawGraph(cursor);
+
+        SeekBar seekBar = (SeekBar)findViewById(R.id.seekBar);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                scale = i;
+                updateGraph();
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
     }
 
+    private void updateGraph() {
+
+    }
 
     private void dateToString(){
         yearString = Integer.toString(year);
@@ -84,7 +108,7 @@ public class GraphicActivity extends AppCompatActivity {
 
     public Cursor getCursor() {
         reader = new DataBaseReader(db);
-        Cursor cursor = reader.ReadHumidadeTemperatura("dataHoraMedicao ='"+yearString+"-"+monthString+"-"+dayString+" 23:59:59.999'");
+        Cursor cursor = reader.ReadHumidadeTemperatura();
         return cursor;
     }
 
@@ -120,12 +144,15 @@ public class GraphicActivity extends AppCompatActivity {
         DataPoint[] datapointsTemperatura = new DataPoint[cursor.getCount()];
         DataPoint[] datapointsHumidade = new DataPoint[cursor.getCount()];
 
+        Log.d("Cursor count", String.valueOf(cursor.getCount()));
+
         //Ir a cada entrada, converter os minutos para decimais e por no grafico
         while(cursor.moveToNext()) {
             Integer dataTemperatura = cursor.getInt(cursor.getColumnIndex("valorMedicaoTemperatura"));
             Integer dataHumidade = cursor.getInt(cursor.getColumnIndex("valorMedicaoHumidade"));
 
             String horaString = cursor.getString(cursor.getColumnIndex("dataHoraMedicao"));
+            Log.d("String da BD", horaString);
             double horaForGraph = convertHourStringToDouble(horaString);
 
             if (helper==0)
@@ -173,7 +200,8 @@ public class GraphicActivity extends AppCompatActivity {
 
 
     private double convertHourStringToDouble(String horaString){
-        String[] horaMinutos = horaString.split(":");
+        String[] temp = horaString.split(" ");
+        String[] horaMinutos = temp[1].split(":");
         int hora = Integer.parseInt(horaMinutos[0]);
         double minutos = Integer.parseInt(horaMinutos[1]);
 

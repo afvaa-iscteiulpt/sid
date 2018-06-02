@@ -11,26 +11,23 @@
         android:id="@+id/refreshButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         android:onClick="mainActivityRefreshDB"
         android:text="Refresh"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/scroller"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ScrollView
         android:id="@+id/scroller"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="381dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/button2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/refreshButton"
@@ -47,10 +44,10 @@
                 android:layout_height="wrap_content">
 
                 <TableRow
-                    android:layout_height="1px"
-                    android:background="#d9d9d9"
                     android:id="@+id/headerRow"
                     android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:background="#d9d9d9"
                     android:gravity="start"
                     android:orientation="horizontal">
 

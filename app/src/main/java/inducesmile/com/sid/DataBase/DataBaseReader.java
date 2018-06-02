@@ -23,17 +23,12 @@ public class DataBaseReader {
     // https://stackoverflow.com/questions/10600670/sqlitedatabase-query-method
 
 
-    public Cursor ReadHumidadeTemperatura(String data){
-
-        //To Do
-       if (data!=null){
-           Log.d("dataString",data);
-       }
+    public Cursor ReadHumidadeTemperatura(){
 
         Cursor cursor = db.query(
                 DataBaseConfig.HumidadeTemperatura.TABLE_NAME,   // Nome da tabela
                 null,
-                        data,
+                null,
                 null,
                 null,
                 null,
