@@ -257,7 +257,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 //only updates the select box on statup
-                if(dataAdapter == null) {
+                if(dataAdapter == null || list.size() != dataAdapter.getCount()) {
                     dataAdapter = new ArrayAdapter<String>(this,
                             android.R.layout.simple_spinner_item, list);
                     dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
