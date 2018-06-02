@@ -121,20 +121,17 @@ public class GraphicActivity extends AppCompatActivity {
         seekBar.refreshDrawableState();
 
         if (graph.getSeries().size() == 0 && temp.length != 0) {
+            drawGraph();
+        }
+        else if (graph.getSeries().size() != 0 && temp.length == 0){
             seriesTemperatura = new LineGraphSeries<>(temp);
-            seriesTemperatura.setColor(Color.RED);
-            seriesTemperatura.setTitle("Temperatura");
-            graph.addSeries(seriesTemperatura);
-        }
-
-        if (graph.getSeries().size() == 0 && humi.length != 0) {
             seriesHumidade = new LineGraphSeries<>(humi);
-            seriesHumidade.setTitle("Humidade");
-            graph.addSeries(seriesHumidade);
+            graph.removeAllSeries();
         }
-
-        if (temp.length != 0) seriesTemperatura.resetData(temp);
-        if (humi.length != 0) seriesHumidade.resetData(humi);
+        else {
+            if (temp.length != 0) seriesTemperatura.resetData(temp);
+            if (humi.length != 0) seriesHumidade.resetData(humi);
+        }
 
         setGraphScale();
     }
