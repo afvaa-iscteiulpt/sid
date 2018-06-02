@@ -19,8 +19,11 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import inducesmile.com.sid.Connection.ConnectionHandler;
+import inducesmile.com.sid.Connection.FetchDataFromURL;
 import inducesmile.com.sid.DataBase.DataBaseHandler;
 import inducesmile.com.sid.DataBase.DataBaseReader;
 import inducesmile.com.sid.Helper.Alert;
@@ -50,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
     private String limInfHumi = "";
     ArrayAdapter<String> dataAdapter = null;
 
+    Timer timer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +64,21 @@ public class MainActivity extends AppCompatActivity {
         clearInputs();
         refreshDB(null);
 
+        timer = new Timer();
+
+        timer.scheduleAtFixedRate(new TimerTask() {
+
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        refreshDB(null);
+                    }
+                });
+            }
+        },60000,60000);
     }
 
     private void clearInputs() {
@@ -94,7 +114,6 @@ public class MainActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 refreshDB(null);
 
-                Log.d("msg", "ola");
             }
 
             @Override
@@ -113,19 +132,41 @@ public class MainActivity extends AppCompatActivity {
             idCultura = String.valueOf(culturasId.get(spinner.getSelectedItemPosition()));
         }
 
-        Log.d("idcultura",String.valueOf(idCultura));
+        FetchDataFromURL.copyDataToDBWithCulturaID(this);
 
-        if(idCultura != null && !idCultura.equals("null")) {
+        if(idCultura != null && !idCultura.equals("null"))
             updateDadosCultura(idCultura);
-            copyDataToDBWithCulturaID(idCultura);
-        } else {
-            copyDataToDBWithCulturaID("null");
+        else clearInputs();
 
-            clearInputs();
-        }
-
+        updateSpinnerData();
         updateNumeroMedicoes();
         updateNumeroAlertas();
+    }
+
+    private void updateSpinnerData() {
+        spinner = (Spinner) findViewById(R.id.spinner);
+        List<String> list = new ArrayList<String>();
+        list.add(" - ");
+        culturasId = new HashMap<>();
+        culturasId.put(0,null);
+
+        DataBaseReader dbReader = new DataBaseReader(db);
+        Cursor cursor = dbReader.readCultura();
+
+        int i = 1;
+        while (cursor.moveToNext()){
+            list.add(cursor.getString(cursor.getColumnIndex("nomeCultura")));
+            culturasId.put(i,cursor.getInt(cursor.getColumnIndex("idCultura")));
+            i++;
+        }
+
+        if(dataAdapter == null || list.size() != dataAdapter.getCount()) {
+            dataAdapter = new ArrayAdapter<String>(this,
+                    android.R.layout.simple_spinner_item, list);
+            dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinner.setAdapter(dataAdapter);
+            addListenerOnSpinnerItemSelection();
+        }
     }
 
     private void updateDadosCultura(String idCultura) {
@@ -158,9 +199,6 @@ public class MainActivity extends AppCompatActivity {
         Log.d("Message", idCultura);
     }
 
-
-
-
     public void updateNumeroMedicoes(){
 
         DataBaseReader dbReader = new DataBaseReader(db);
@@ -185,91 +223,6 @@ public class MainActivity extends AppCompatActivity {
         int totalAlertas = cursor.getCount();
         text.setText(Integer.toString(totalAlertas));
 
-    }
-
-    //bug - quando arranca chama duas vezes esta função , não é grave. Os pedidos restantes funcionam sem problemas.
-    public void copyDataToDBWithCulturaID(String idCultura) {
-        try {
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-            HashMap<String, String> params = new HashMap<>();
-            params.put("username", username);
-            params.put("password", password);
-            params.put("idCultura",idCultura);
-            ConnectionHandler jParser = new ConnectionHandler();
-            db.dbClear();
-
-
-            JSONArray jsonHumidadeTemperatura = jParser.getJSONFromUrl(READ_HUMIDADE_TEMPERATURA, params);
-            if (jsonHumidadeTemperatura !=null){
-                for (int i = 0; i < jsonHumidadeTemperatura.length(); i++) {
-                    JSONObject c = jsonHumidadeTemperatura.getJSONObject(i);
-                    int idMedicao = c.getInt("idMedicao");
-                    String dataHoraMedicao = c.getString("dataHoraMedicao");
-                    double valorMedicaoTemperatura = c.getDouble("valorMedicaoTemperatura");
-                    double valorMedicaoHumidade = c.getDouble("valorMedicaoHumidade");
-
-                    db.insert_Humidade_Temperatura(idMedicao,dataHoraMedicao,valorMedicaoTemperatura,valorMedicaoHumidade);
-                }
-            }
-
-
-
-            JSONArray jsonAlertas = jParser.getJSONFromUrl(READ_ALERTAS,params);
-            if (jsonAlertas!=null){
-                for (int i = 0; i < jsonAlertas.length(); i++) {
-                    JSONObject c = jsonAlertas.getJSONObject(i);
-
-                    int idAlerta = c.getInt("idAlerta");
-                    String tipoAlerta = c.getString("tipoAlerta");
-                    String idCulturaResult = c.getString("idCultura");
-                    String dataHoraMedicao = c.getString("dataHora");
-                    String valorReg = c.getString("valorReg");
-
-                    db.insert_Alertas(idAlerta,dataHoraMedicao,Double.valueOf(valorReg),idCulturaResult,tipoAlerta);
-                }
-
-            }
-
-            Log.d("msg", "ok");
-
-            spinner = (Spinner) findViewById(R.id.spinner);
-            List<String> list = new ArrayList<String>();
-            list.add(" - ");
-            culturasId = new HashMap<>();
-            culturasId.put(0,null);
-
-            JSONArray jsonCultura = jParser.getJSONFromUrl(READ_CULTURA,params);
-            if (jsonCultura!=null){
-                for (int i = 1; i < jsonCultura.length(); i++) {
-
-                    JSONObject c = jsonCultura.getJSONObject(i);
-
-                    culturasId.put(i,c.getInt("idCultura"));
-                    list.add(c.getString("nomeCultura"));
-
-                    String nomeCultura = c.getString("nomeCultura");
-                    double limSupTempCultura = c.getDouble("limiteSuperiorTemperatura");
-                    double limInfTempCultura = c.getDouble("limiteInferiorTemperatura");
-                    double limSupHumiCultura = c.getDouble("limiteSuperiorHumidade");
-                    double limInfHumiCultura = c.getDouble("limiteInferiorHumidade");
-                    db.insert_Cultura(c.getInt("idCultura"),nomeCultura,limSupTempCultura,limInfTempCultura,limSupHumiCultura,limInfHumiCultura);
-                }
-
-                //only updates the select box on statup
-                if(dataAdapter == null || list.size() != dataAdapter.getCount()) {
-                    dataAdapter = new ArrayAdapter<String>(this,
-                            android.R.layout.simple_spinner_item, list);
-                    dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spinner.setAdapter(dataAdapter);
-                    addListenerOnSpinnerItemSelection();
-                }
-
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
 
 }

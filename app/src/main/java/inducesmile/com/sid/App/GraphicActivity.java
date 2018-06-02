@@ -113,6 +113,10 @@ public class GraphicActivity extends AppCompatActivity {
         DataPoint[] temp = generateTemperatura();
         DataPoint[] humi = generateHumidade();
 
+        SeekBar seekBar = (SeekBar)findViewById(R.id.seekBar);
+        seekBar.setProgress(scale);
+        seekBar.refreshDrawableState();
+
         if (temp.length != 0) seriesTemperatura.resetData(temp);
         if (humi.length != 0) seriesHumidade.resetData(humi);
 
@@ -146,9 +150,16 @@ public class GraphicActivity extends AppCompatActivity {
     public void goToToday(View v) {
         selectedDate = null;
         selectedDate = Calendar.getInstance();
-        updateDates();
+        scale = 1;
 
+        updateDates();
         insertDateString();
+        updateGraph();
+    }
+
+    public void refreshData(View v) {
+        scale = 1;
+        updateDates();
         updateGraph();
     }
 

@@ -15,11 +15,13 @@ public class DatePickerActivitiy extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_date_picker_activitiy);
+        DatePicker datePicker = findViewById(R.id.datePicker);
+        datePicker.setMaxDate(System.currentTimeMillis());
     }
 
     public void confirmChoice(View v){
         DatePicker datePicker = findViewById(R.id.datePicker);
-        datePicker.setMaxDate(System.currentTimeMillis());
+
         int[] yearMonthDay= new int[3];
 
         yearMonthDay[0] = datePicker.getYear();
