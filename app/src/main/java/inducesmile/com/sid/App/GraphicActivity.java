@@ -31,11 +31,14 @@ public class GraphicActivity extends AppCompatActivity {
 
     private DataBaseHandler db = new DataBaseHandler(this);
     private GraphView graph;
+    LineGraphSeries<DataPoint> seriesTemperatura;
+    LineGraphSeries<DataPoint> seriesHumidade;
     private DataBaseReader reader;
     private Calendar selectedDate = Calendar.getInstance();
-    private int scale = 2;
+    private int scale = 1;
 
-    private String[] months = {"Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"};
+    private String[] months = {"Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+            "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"};
 
 
     @Override
@@ -52,15 +55,18 @@ public class GraphicActivity extends AppCompatActivity {
         else selectedDate = Calendar.getInstance();
 
         insertDateString();
-        Cursor cursor = getCursor();
-        drawGraph(cursor);
+        drawGraph();
+        setGraphScale();
 
         SeekBar seekBar = (SeekBar)findViewById(R.id.seekBar);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 scale = i;
-                updateGraph();
+                Cursor cursor = getCursor();
+                seriesTemperatura.resetData(generateTemperatura());
+                seriesHumidade.resetData(generateHumidade());
+                Log.d("update scale", String.valueOf(scale));
             }
 
             @Override
@@ -73,10 +79,6 @@ public class GraphicActivity extends AppCompatActivity {
 
             }
         });
-    }
-
-    private void updateGraph() {
-
     }
 
     private void insertDateString(){
@@ -113,15 +115,42 @@ public class GraphicActivity extends AppCompatActivity {
         finish();
     }
 
-    private void drawGraph(Cursor cursor){
+    private DataPoint[] generateTemperatura() {
+        Cursor cursor = getCursor();
         int helper = 0;
 
         DataPoint[] datapointsTemperatura = new DataPoint[cursor.getCount()];
+
+        //Ir a cada entrada, converter os minutos para decimais e por no grafico
+        while (cursor.moveToNext()) {
+            Double dataTemperatura = cursor.getDouble(cursor.getColumnIndex("valorMedicaoTemperatura"));
+
+            String dataHoraString = cursor.getString(cursor.getColumnIndex("dataHoraMedicao"));
+            Log.d("String da BD", dataHoraString);
+
+            Date dateTime = new Date();
+            DateFormat dataFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try {
+                dateTime = dataFormat.parse(dataHoraString);
+            } catch (ParseException e) {
+                Log.e("DateTime message", "Parsing ISO8601 datetime failed", e);
+            }
+
+            datapointsTemperatura[helper] = new DataPoint(dateTime, dataTemperatura);
+            helper++;
+        }
+
+        return datapointsTemperatura;
+    }
+
+    private DataPoint[] generateHumidade() {
+        Cursor cursor = getCursor();
+        int helper = 0;
+
         DataPoint[] datapointsHumidade = new DataPoint[cursor.getCount()];
 
         //Ir a cada entrada, converter os minutos para decimais e por no grafico
-        while(cursor.moveToNext()) {
-            Double dataTemperatura = cursor.getDouble(cursor.getColumnIndex("valorMedicaoTemperatura"));
+        while (cursor.moveToNext()) {
             Double dataHumidade = cursor.getDouble(cursor.getColumnIndex("valorMedicaoHumidade"));
 
             String dataHoraString = cursor.getString(cursor.getColumnIndex("dataHoraMedicao"));
@@ -135,24 +164,29 @@ public class GraphicActivity extends AppCompatActivity {
                 Log.e("DateTime message", "Parsing ISO8601 datetime failed", e);
             }
 
-            datapointsTemperatura[helper] = new DataPoint(dateTime,dataTemperatura);
-            datapointsHumidade[helper] = new DataPoint(dateTime,dataHumidade);
+            datapointsHumidade[helper] = new DataPoint(dateTime, dataHumidade);
             helper++;
         }
-        cursor.close();
-        
-        LineGraphSeries<DataPoint> seriesTemperatura = new LineGraphSeries<>(datapointsTemperatura);
-        LineGraphSeries<DataPoint> seriesHumidade = new LineGraphSeries<>(datapointsHumidade);
+
+        return datapointsHumidade;
+    }
+
+    private void drawGraph() {
+        seriesTemperatura = new LineGraphSeries<>(generateTemperatura());
+        seriesHumidade = new LineGraphSeries<>(generateHumidade());
+
+        graph.addSeries(seriesTemperatura);
+        graph.addSeries(seriesHumidade);
 
         seriesTemperatura.setColor(Color.RED);
         seriesTemperatura.setTitle("Temperatura");
         seriesHumidade.setTitle("Humidade");
         graph.getLegendRenderer().setVisible(true);
-        graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
+        graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.BOTTOM);
         graph.getLegendRenderer().setBackgroundColor(Color.alpha(0));
+    }
 
-        graph.getViewport().setXAxisBoundsManual(true);
-
+    private void setGraphScale() {
         // set date label formatter
         graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this));
         graph.getGridLabelRenderer().setNumHorizontalLabels(3); // only 4 because of the space
@@ -170,15 +204,6 @@ public class GraphicActivity extends AppCompatActivity {
         // as we use dates as labels, the human rounding to nice readable numbers
         // is not necessary
         graph.getGridLabelRenderer().setHumanRounding(false);
-
-        graph.getViewport().setScalable(true);
-        graph.getViewport().setScalableY(true);
-        graph.addSeries(seriesTemperatura);
-        graph.addSeries(seriesHumidade);
     }
-
-
-
-
 
 }
