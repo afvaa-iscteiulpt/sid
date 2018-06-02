@@ -169,11 +169,18 @@ public class GraphicActivity extends AppCompatActivity {
     }
 
     private void drawGraph() {
-        seriesTemperatura = new LineGraphSeries<>(generateTemperatura());
-        seriesHumidade = new LineGraphSeries<>(generateHumidade());
+        DataPoint[] temp = generateTemperatura();
+        DataPoint[] humi = generateHumidade();
 
-        graph.addSeries(seriesTemperatura);
-        graph.addSeries(seriesHumidade);
+        if (temp[0] != null) {
+            seriesTemperatura = new LineGraphSeries<>(temp);
+            graph.addSeries(seriesTemperatura);
+        }
+
+        if (humi[0] != null) {
+            seriesHumidade = new LineGraphSeries<>(humi);
+            graph.addSeries(seriesHumidade);
+        }
 
         seriesTemperatura.setColor(Color.RED);
         seriesTemperatura.setTitle("Temperatura");
