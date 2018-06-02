@@ -19,6 +19,7 @@ public class DatePickerActivitiy extends AppCompatActivity {
 
     public void confirmChoice(View v){
         DatePicker datePicker = findViewById(R.id.datePicker);
+        datePicker.setMaxDate(System.currentTimeMillis());
         int[] yearMonthDay= new int[3];
 
         yearMonthDay[0] = datePicker.getYear();
