@@ -63,6 +63,7 @@ public class LoginActivity extends AppCompatActivity {
 
     public void loginClick(View v) {
 
+
         UserLogin newuser = new UserLogin(ip.getText().toString(), port.getText().toString(), username.getText().toString(), password.getText().toString());
 
         if (!ip.getText().toString().isEmpty() && !port.getText().toString().isEmpty() && !username.getText().toString().isEmpty() && !password.getText().toString().isEmpty()) {

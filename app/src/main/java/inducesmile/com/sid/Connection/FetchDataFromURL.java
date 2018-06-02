@@ -20,10 +20,10 @@ import inducesmile.com.sid.Helper.UserLogin;
 import inducesmile.com.sid.R;
 
 public class FetchDataFromURL {
-    private static final String IP = UserLogin.getInstance().getIp();
-    private static final String PORT = UserLogin.getInstance().getPort();
-    private static final String username= UserLogin.getInstance().getUsername();
-    private static final String password = UserLogin.getInstance().getPassword();
+    private static String IP = UserLogin.getInstance().getIp();
+    private static String PORT = UserLogin.getInstance().getPort();
+    private static String username= UserLogin.getInstance().getUsername();
+    private static String password = UserLogin.getInstance().getPassword();
 
     public static final String READ_HUMIDADE_TEMPERATURA = "http://" + IP + ":" + PORT + "/getHumidade_Temperatura.php";
     public static final String READ_ALERTAS = "http://" + IP + ":" + PORT + "/getAlertas.php";
@@ -32,6 +32,12 @@ public class FetchDataFromURL {
     public static void copyDataToDBWithCulturaID(Context ct) {
         DataBaseHandler db = new DataBaseHandler(ct);
         try {
+
+            IP = UserLogin.getInstance().getIp();
+            PORT = UserLogin.getInstance().getPort();
+            username= UserLogin.getInstance().getUsername();
+            password = UserLogin.getInstance().getPassword();
+
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
             HashMap<String, String> params = new HashMap<>();
