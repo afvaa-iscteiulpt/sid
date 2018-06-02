@@ -1,10 +1,12 @@
 package inducesmile.com.sid.App;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -167,7 +169,7 @@ public class AlertasActivity extends AppCompatActivity {
         }
 
         SharedPreferences.Editor editor = alertAlreadyRead.edit();
-        editor.putString("alertIds", "");
+        editor.putString("alertIds", stringB.toString());
         editor.commit();
     }
 
@@ -230,4 +232,5 @@ public class AlertasActivity extends AppCompatActivity {
     public void backToMainView(View v) {
         finish();
     }
+
 }
