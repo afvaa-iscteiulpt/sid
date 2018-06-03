@@ -3,7 +3,6 @@ package inducesmile.com.sid.App;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -12,21 +11,15 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import inducesmile.com.sid.Connection.ConnectionHandler;
 import inducesmile.com.sid.Connection.FetchDataFromURL;
 import inducesmile.com.sid.DataBase.DataBaseHandler;
 import inducesmile.com.sid.DataBase.DataBaseReader;
-import inducesmile.com.sid.Helper.Alert;
 import inducesmile.com.sid.Helper.UserLogin;
 import inducesmile.com.sid.R;
 
@@ -59,7 +52,8 @@ public class MainActivity extends AppCompatActivity {
         db.dbClear();
         spinner = (Spinner) findViewById(R.id.spinner);
         clearInputs();
-        refreshDB(null);
+        FetchDataFromURL.fetchAllData(this);
+        updateAll();
 
         timer = new Timer();
 
@@ -121,7 +115,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void refreshDB(View v){
-        FetchDataFromURL.copyDataToDBWithCulturaID(this);
+        int lastCultura = 0;
+        int lastAlerta = 0;
+        int lastMedicao = 0;
+
+        DataBaseReader dbReader = new DataBaseReader(db);
+        Cursor cursor = dbReader.readCultura();
+        if (cursor.moveToLast()) {
+            lastCultura = cursor.getInt(cursor.getColumnIndex("idCultura"));
+        }
+
+        cursor = dbReader.readAlertas();
+        if (cursor.moveToFirst()) {
+            lastAlerta = cursor.getInt(cursor.getColumnIndex("idAlerta"));
+        }
+
+        cursor = dbReader.ReadHumidadeTemperatura();
+        if (cursor.moveToLast()) {
+            lastMedicao = cursor.getInt(cursor.getColumnIndex("idMedicao"));
+        }
+        cursor.close();
+
+        FetchDataFromURL.fetchAlertasAfterID(this, lastAlerta);
+        FetchDataFromURL.fetchCulturasAfterID(this, lastCultura);
+        FetchDataFromURL.fetchMedicoesAfterID(this, lastMedicao);
         updateAll();
     }
 

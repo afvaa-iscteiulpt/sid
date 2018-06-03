@@ -61,7 +61,7 @@ public class DataBaseReader {
                 null,
                 null,
                 null,
-                null
+                "idAlerta DESC"
         );
         return cursor;
     }

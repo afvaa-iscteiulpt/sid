@@ -172,7 +172,7 @@ public class GraphicActivity extends AppCompatActivity {
 
         selectedDate = null;
         selectedDate = Calendar.getInstance();
-        scale = 1;
+        scale = 0;
 
         updateDates();
         insertDateString();
@@ -275,7 +275,6 @@ public class GraphicActivity extends AppCompatActivity {
     }
 
     private void setGraphScale() {
-        graph.getViewport().computeScroll();
         setDefaultAxisFormat();
 
         graph.getViewport().setXAxisBoundsManual(true);
@@ -285,47 +284,22 @@ public class GraphicActivity extends AppCompatActivity {
         graph.getViewport().setYAxisBoundsManual(true);
         graph.getViewport().setMinY(0);
         graph.getViewport().setMaxY(100);
-        graph.getViewport().calcCompleteRange();
+
+        graph.getGridLabelRenderer().setHumanRounding(false);
     }
 
     private void setDefaultAxisFormat() {
-        //StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(graph);
+        final DateFormat dateFormat = new SimpleDateFormat("HH:mm");
 
-        graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this));
-        graph.getGridLabelRenderer().setNumHorizontalLabels(2); // only 4 because of the space
-
-        graph.getViewport().setMinX(beginDate.getTime().getTime());
-        graph.getViewport().setMaxX(endDate.getTime().getTime());
-        graph.getViewport().setXAxisBoundsManual(true);
-
-        graph.getGridLabelRenderer().setHumanRounding(false);
-
-        /*if (scale == 0) {
-            Calendar middleDate = Calendar.getInstance();
-            middleDate.set(beginDate.get(Calendar.YEAR),beginDate.get(Calendar.MONTH),beginDate.get(Calendar.DAY_OF_MONTH),0,0,0);
-
-            staticLabelsFormatter.setHorizontalLabels(new String[] {
-                    beginDate.get(Calendar.DAY_OF_MONTH)+ "/" +(beginDate.get(Calendar.MONTH)+1)});
-        }
-        else if (scale == 1) {
-            Calendar middleHour = Calendar.getInstance();
-            middleHour.set(beginDate.get(Calendar.YEAR),beginDate.get(Calendar.MONTH),beginDate.get(Calendar.DAY_OF_MONTH),0,0,0);
-            middleHour.add(Calendar.MINUTE, -30);
-
-            staticLabelsFormatter.setHorizontalLabels(new String[] {
-                    middleHour.get(Calendar.MINUTE)+ "'"});
-        }
-        else {
-            Calendar middleHour = Calendar.getInstance();
-            middleHour.set(beginDate.get(Calendar.YEAR),beginDate.get(Calendar.MONTH),beginDate.get(Calendar.DAY_OF_MONTH),
-                    beginDate.get(Calendar.HOUR),beginDate.get(Calendar.MINUTE),0);
-            middleHour.add(Calendar.MINUTE, -2);
-
-            staticLabelsFormatter.setHorizontalLabels(new String[] {
-                    middleHour.get(Calendar.MINUTE)+ "'"});
-        }*/
-
-        //graph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
-
+        graph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter() {
+            @Override
+            public String formatLabel(double value, boolean isValueX) {
+                if(isValueX) {
+                    return dateFormat.format(new Date((long)value));
+                }
+                else return super.formatLabel(value, isValueX);
+            }
+        });
+        graph.getGridLabelRenderer().setNumHorizontalLabels(3); // only 4 because of the space
     }
 }

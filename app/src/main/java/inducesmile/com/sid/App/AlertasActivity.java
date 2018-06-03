@@ -1,16 +1,10 @@
 package inducesmile.com.sid.App;
 
-import android.app.ProgressDialog;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.os.AsyncTask;
-import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Spinner;
@@ -18,49 +12,33 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import inducesmile.com.sid.Connection.ConnectionHandler;
 import inducesmile.com.sid.Connection.FetchDataFromURL;
 import inducesmile.com.sid.DataBase.DataBaseHandler;
 import inducesmile.com.sid.DataBase.DataBaseReader;
-import inducesmile.com.sid.Helper.UserLogin;
 import inducesmile.com.sid.R;
 import android.view.View.OnClickListener;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 
 public class AlertasActivity extends AppCompatActivity {
 
     DataBaseHandler db = new DataBaseHandler(this);
-    Spinner spinner;
     int numAlertas = 0;
+    int ultimoId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alertas);
         Cursor alertasCursor= getAlertasCursor();
-        Cursor culturaCursor = getCulturaCursor();
         listAlertas(alertasCursor);
 
         //call to reset readed alerts
         //resetReadedAlertas();
-    }
-
-    public Cursor getCulturaCursor(){
-        DataBaseReader dbReader = new DataBaseReader(db);
-        Cursor cursor = dbReader.readCultura();
-        return cursor;
     }
 
     public Cursor getAlertasCursor(){
@@ -77,6 +55,9 @@ public class AlertasActivity extends AppCompatActivity {
         numAlertas = 0;
 
         while (alertasCursor.moveToNext()){
+            if (ultimoId == -1)
+                ultimoId = alertasCursor.getInt(alertasCursor.getColumnIndex("idAlerta"));
+
             TableRow row = new TableRow(this);
             row.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
 
@@ -206,12 +187,8 @@ public class AlertasActivity extends AppCompatActivity {
 
     public void mainActivityRefreshDB(View v) {
         Button button = findViewById(R.id.refreshButton);
-        button.setBackgroundColor(Color.rgb(255,230,230));
-        FetchDataFromURL.copyDataToDBWithCulturaID(this);
+        if (ultimoId != -1) FetchDataFromURL.fetchAlertasAfterID(this, ultimoId);
         listAlertas(getAlertasCursor());
-
-        button.setBackgroundColor(Color.rgb(230,230,230));
-
     }
 
     private int dpAsPixels(int dp){
