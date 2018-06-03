@@ -109,7 +109,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="left|center"
-                android:text="48 horas"
+                android:text="Dia"
                 android:textAppearance="@android:style/TextAppearance.Material.Medium" />
 
             <TextView
@@ -118,7 +118,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="Dia"
+                android:text="Hora"
                 android:textAppearance="@android:style/TextAppearance.Material.Medium" />
 
             <TextView
@@ -127,7 +127,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="right|center"
-                android:text="Hora"
+                android:text="5 min"
                 android:textAppearance="@android:style/TextAppearance.Material.Medium" />
 
         </LinearLayout>
@@ -142,7 +142,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:max="2"
-            android:progress="1"
+            android:progress="0"
             app:layout_constraintBottom_toTopOf="@+id/graph"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

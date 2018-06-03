@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -89,9 +90,6 @@ public class AlertasActivity extends AppCompatActivity {
 
             Calendar day = Calendar.getInstance();
             String dateTime = alertasCursor.getString(alertasCursor.getColumnIndex("dataHora"));
-
-            Log.d("dia 1",dateFormat.format(day.getTime()).split(" ")[0]);
-            Log.d("dia 2",dateTime.split(" ")[0]);
 
             if (dateFormat.format(day.getTime()).split(" ")[0].equals(dateTime.split(" ")[0]))
                 data.setText("hoje");
@@ -207,11 +205,12 @@ public class AlertasActivity extends AppCompatActivity {
     }
 
     public void mainActivityRefreshDB(View v) {
-        spinner = (Spinner) findViewById(R.id.spinner);
-        //String idCultura = culturasId.get(spinner.getSelectedItemPosition()).toString();
-
+        Button button = findViewById(R.id.refreshButton);
+        button.setBackgroundColor(Color.rgb(255,230,230));
         FetchDataFromURL.copyDataToDBWithCulturaID(this);
         listAlertas(getAlertasCursor());
+
+        button.setBackgroundColor(Color.rgb(230,230,230));
 
     }
 

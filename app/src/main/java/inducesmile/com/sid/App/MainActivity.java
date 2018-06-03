@@ -109,8 +109,7 @@ public class MainActivity extends AppCompatActivity {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                refreshDB(null);
-
+                updateAll();
             }
 
             @Override
@@ -122,21 +121,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void refreshDB(View v){
+        FetchDataFromURL.copyDataToDBWithCulturaID(this);
+        updateAll();
+    }
 
+    private void updateAll() {
         String idCultura = null;
 
         if(culturasId != null) {
             idCultura = String.valueOf(culturasId.get(spinner.getSelectedItemPosition()));
         }
 
-        FetchDataFromURL.copyDataToDBWithCulturaID(this);
-
         if(idCultura != null && !idCultura.equals("null"))
             updateDadosCultura(idCultura);
         else clearInputs();
 
         updateSpinnerData();
-        updateNumeroMedicoes();
         updateNumeroAlertas();
     }
 
@@ -154,7 +154,6 @@ public class MainActivity extends AppCompatActivity {
         while (cursor.moveToNext()){
             list.add(cursor.getString(cursor.getColumnIndex("nomeCultura")));
             culturasId.put(i,cursor.getInt(cursor.getColumnIndex("idCultura")));
-            Log.d("teste do spinner", cursor.getString(cursor.getColumnIndex("nomeCultura")));
             i++;
         }
 
@@ -198,20 +197,9 @@ public class MainActivity extends AppCompatActivity {
         text = findViewById(R.id.limInfHumi);
         text.setText(limInfHumi);
 
-        Log.d("Message", idCultura);
-    }
+        text = findViewById(R.id.idCultura);
+        text.setText(idCultura);
 
-    public void updateNumeroMedicoes(){
-
-        DataBaseReader dbReader = new DataBaseReader(db);
-
-        TextView text = findViewById(R.id.totalMedicoes);
-        text.setText(Integer.toString(0));
-
-        Cursor cursor = dbReader.ReadHumidadeTemperatura();
-        int totalMedicoes = cursor.getCount();
-        text.setText(Integer.toString(totalMedicoes));
-        cursor.close();
     }
 
     public void updateNumeroAlertas(){

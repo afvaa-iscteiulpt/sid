@@ -41,7 +41,7 @@ public class GraphicActivity extends AppCompatActivity {
     private Calendar selectedDate = Calendar.getInstance();
     private Calendar beginDate = Calendar.getInstance();
     private Calendar endDate = Calendar.getInstance();
-    private int scale = 1;
+    private int scale = 0;
 
     private String[] months = {"Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
             "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"};
@@ -62,7 +62,6 @@ public class GraphicActivity extends AppCompatActivity {
         }
         else {
             selectedDate = Calendar.getInstance();
-            Log.d("data atual",selectedDate.getTime().toString());
             updateDates();
         }
 
@@ -96,10 +95,7 @@ public class GraphicActivity extends AppCompatActivity {
         endDate.set(selectedDate.get(Calendar.YEAR),selectedDate.get(Calendar.MONTH),selectedDate.get(Calendar.DAY_OF_MONTH),0,0,0);
         endDate.add(Calendar.DAY_OF_MONTH,1);
 
-        if (scale == 0) {
-            beginDate.add(Calendar.DAY_OF_MONTH, -1);
-        }
-        else if (scale == 2) {
+        if (scale == 1) {
             beginDate.set(selectedDate.get(Calendar.YEAR),selectedDate.get(Calendar.MONTH),selectedDate.get(Calendar.DAY_OF_MONTH),
                     selectedDate.get(Calendar.HOUR_OF_DAY),selectedDate.get(Calendar.MINUTE),0);
             beginDate.add(Calendar.MINUTE,-50);
@@ -107,9 +103,15 @@ public class GraphicActivity extends AppCompatActivity {
                     selectedDate.get(Calendar.HOUR_OF_DAY),selectedDate.get(Calendar.MINUTE),0);
             endDate.add(Calendar.MINUTE,10);
         }
+        else if (scale == 2) {
+            beginDate.set(selectedDate.get(Calendar.YEAR),selectedDate.get(Calendar.MONTH),selectedDate.get(Calendar.DAY_OF_MONTH),
+                    selectedDate.get(Calendar.HOUR_OF_DAY),selectedDate.get(Calendar.MINUTE),selectedDate.get(Calendar.SECOND));
+            beginDate.add(Calendar.MINUTE,-4);
+            endDate.set(selectedDate.get(Calendar.YEAR),selectedDate.get(Calendar.MONTH),selectedDate.get(Calendar.DAY_OF_MONTH),
+                    selectedDate.get(Calendar.HOUR_OF_DAY),selectedDate.get(Calendar.MINUTE),selectedDate.get(Calendar.SECOND));
+            endDate.add(Calendar.MINUTE,1);
+        }
 
-        Log.d("beginDate", beginDate.getTime().toString());
-        Log.d("endDate", endDate.getTime().toString());
     }
 
     private void updateGraph() {
@@ -178,7 +180,6 @@ public class GraphicActivity extends AppCompatActivity {
     }
 
     public void refreshData(View v) {
-        scale = 1;
         updateDates();
         updateGraph();
     }
@@ -206,11 +207,9 @@ public class GraphicActivity extends AppCompatActivity {
                 Log.e("DateTime message", "Parsing ISO8601 datetime failed", e);
             }
 
-            Log.d("valorTemp", String.valueOf(cursor.getDouble(cursor.getColumnIndex("valorMedicaoTemperatura"))));
-
             if (cursor.isNull(cursor.getColumnIndex("valorMedicaoTemperatura"))) {
                 if (helper == 0) datapointsTemperatura[helper] = new DataPoint(dateTime, 0);
-                else datapointsTemperatura[helper] = new DataPoint(dateTime, datapointsTemperatura[helper - 1].getX());
+                else datapointsTemperatura[helper] = new DataPoint(dateTime, datapointsTemperatura[helper - 1].getY());
             }
             else {
                 Double dataTemperatura = cursor.getDouble(cursor.getColumnIndex("valorMedicaoTemperatura"));
@@ -242,7 +241,7 @@ public class GraphicActivity extends AppCompatActivity {
 
             if (cursor.isNull(cursor.getColumnIndex("valorMedicaoHumidade"))) {
                 if (helper == 0) datapointsHumidade[helper] = new DataPoint(dateTime, 0);
-                else datapointsHumidade[helper] = new DataPoint(dateTime, datapointsHumidade[helper - 1].getX());
+                else datapointsHumidade[helper] = new DataPoint(dateTime, datapointsHumidade[helper - 1].getY());
             }
             else {
                 Double dataHumidade = cursor.getDouble(cursor.getColumnIndex("valorMedicaoHumidade"));
@@ -276,6 +275,9 @@ public class GraphicActivity extends AppCompatActivity {
     }
 
     private void setGraphScale() {
+        graph.getViewport().computeScroll();
+        setDefaultAxisFormat();
+
         graph.getViewport().setXAxisBoundsManual(true);
         graph.getViewport().setMinX(beginDate.getTime().getTime());
         graph.getViewport().setMaxX(endDate.getTime().getTime());
@@ -283,35 +285,47 @@ public class GraphicActivity extends AppCompatActivity {
         graph.getViewport().setYAxisBoundsManual(true);
         graph.getViewport().setMinY(0);
         graph.getViewport().setMaxY(100);
-
-        setDefaultAxisFormat();
+        graph.getViewport().calcCompleteRange();
     }
 
     private void setDefaultAxisFormat() {
-        StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(graph);
+        //StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(graph);
 
-        if (scale == 0) {
+        graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this));
+        graph.getGridLabelRenderer().setNumHorizontalLabels(2); // only 4 because of the space
+
+        graph.getViewport().setMinX(beginDate.getTime().getTime());
+        graph.getViewport().setMaxX(endDate.getTime().getTime());
+        graph.getViewport().setXAxisBoundsManual(true);
+
+        graph.getGridLabelRenderer().setHumanRounding(false);
+
+        /*if (scale == 0) {
             Calendar middleDate = Calendar.getInstance();
             middleDate.set(beginDate.get(Calendar.YEAR),beginDate.get(Calendar.MONTH),beginDate.get(Calendar.DAY_OF_MONTH),0,0,0);
 
             staticLabelsFormatter.setHorizontalLabels(new String[] {
-                    beginDate.get(Calendar.DAY_OF_MONTH)+ "/" +(beginDate.get(Calendar.MONTH)+1),
-                    middleDate.get(Calendar.DAY_OF_MONTH)+ "/" +(middleDate.get(Calendar.MONTH)+1),
-                    endDate.get(Calendar.DAY_OF_MONTH)+ "/" +(endDate.get(Calendar.MONTH)+1)});
+                    beginDate.get(Calendar.DAY_OF_MONTH)+ "/" +(beginDate.get(Calendar.MONTH)+1)});
         }
-        else if (scale == 1) staticLabelsFormatter.setHorizontalLabels(new String[] {"0h","6h","12h","18h"});
-        else {
+        else if (scale == 1) {
             Calendar middleHour = Calendar.getInstance();
             middleHour.set(beginDate.get(Calendar.YEAR),beginDate.get(Calendar.MONTH),beginDate.get(Calendar.DAY_OF_MONTH),0,0,0);
-            middleHour.add(Calendar.MINUTE, 30);
+            middleHour.add(Calendar.MINUTE, -30);
 
             staticLabelsFormatter.setHorizontalLabels(new String[] {
-                    beginDate.get(Calendar.MINUTE)+ "'",
-                    middleHour.get(Calendar.MINUTE)+ "'",
-                    endDate.get(Calendar.MINUTE)+ "'"});
+                    middleHour.get(Calendar.MINUTE)+ "'"});
         }
+        else {
+            Calendar middleHour = Calendar.getInstance();
+            middleHour.set(beginDate.get(Calendar.YEAR),beginDate.get(Calendar.MONTH),beginDate.get(Calendar.DAY_OF_MONTH),
+                    beginDate.get(Calendar.HOUR),beginDate.get(Calendar.MINUTE),0);
+            middleHour.add(Calendar.MINUTE, -2);
 
-        graph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
+            staticLabelsFormatter.setHorizontalLabels(new String[] {
+                    middleHour.get(Calendar.MINUTE)+ "'"});
+        }*/
+
+        //graph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
 
     }
 }

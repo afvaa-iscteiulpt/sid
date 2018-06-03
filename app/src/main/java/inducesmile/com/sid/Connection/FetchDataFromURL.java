@@ -76,7 +76,6 @@ public class FetchDataFromURL {
                     String idCulturaResult = c.getString("idCultura");
                     String dataHoraMedicao = c.getString("dataHora");
                     String valorReg = c.getString("valorReg");
-                    Log.d("alerta vazio", valorReg);
 
                     db.insert_Alertas(idAlerta,dataHoraMedicao, valorReg,idCulturaResult,tipoAlerta);
 

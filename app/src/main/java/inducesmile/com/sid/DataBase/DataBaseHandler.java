@@ -37,6 +37,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         sqLiteDatabase.execSQL(config.SQL_DELETE_HUMIDADE_TEMPERATURA);
         sqLiteDatabase.execSQL(config.SQL_DELETE_ALERTAS);
+        sqLiteDatabase.execSQL(config.SQL_DELETE_CULTURA);
         onCreate(sqLiteDatabase);
     }
 
@@ -49,14 +50,6 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         getWritableDatabase().execSQL(config.SQL_DELETE_ALERTAS);
         getWritableDatabase().execSQL(config.SQL_DELETE_CULTURA);
         onCreate(getWritableDatabase());
-    }
-
-    public void humiTempClear() {
-        getWritableDatabase().execSQL(config.SQL_DELETE_HUMIDADE_TEMPERATURA);
-    }
-
-    public void dbClearAlertas() {
-        getWritableDatabase().execSQL(config.SQL_CLEAN_ALERTAS);
     }
 
     public void insert_Humidade_Temperatura(int idMedicao,String datahoraMedicao,Double valorMedicaoTemperatura,Double valorMedicaoHumidade){
