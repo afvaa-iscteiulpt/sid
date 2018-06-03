@@ -59,7 +59,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         getWritableDatabase().execSQL(config.SQL_CLEAN_ALERTAS);
     }
 
-    public void insert_Humidade_Temperatura(int idMedicao,String datahoraMedicao,double valorMedicaoTemperatura,double valorMedicaoHumidade){
+    public void insert_Humidade_Temperatura(int idMedicao,String datahoraMedicao,Double valorMedicaoTemperatura,Double valorMedicaoHumidade){
         ContentValues values = new ContentValues();
         values.put(DataBaseConfig.HumidadeTemperatura.COLUMN_NAME_IDMEDICAO,idMedicao);
         values.put(DataBaseConfig.HumidadeTemperatura.COLUMN_NAME_DATAHORAMEDICAO,datahoraMedicao);

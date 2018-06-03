@@ -195,7 +195,7 @@ public class GraphicActivity extends AppCompatActivity {
 
 
         while (cursor.moveToNext()) {
-            Double dataTemperatura = cursor.getDouble(cursor.getColumnIndex("valorMedicaoTemperatura"));
+
             String dataHoraString = cursor.getString(cursor.getColumnIndex("dataHoraMedicao"));
 
             Date dateTime = new Date();
@@ -205,7 +205,17 @@ public class GraphicActivity extends AppCompatActivity {
             } catch (ParseException e) {
                 Log.e("DateTime message", "Parsing ISO8601 datetime failed", e);
             }
-            datapointsTemperatura[helper] = new DataPoint(dateTime, dataTemperatura);
+
+            Log.d("valorTemp", String.valueOf(cursor.getDouble(cursor.getColumnIndex("valorMedicaoTemperatura"))));
+
+            if (cursor.isNull(cursor.getColumnIndex("valorMedicaoTemperatura"))) {
+                if (helper == 0) datapointsTemperatura[helper] = new DataPoint(dateTime, 0);
+                else datapointsTemperatura[helper] = new DataPoint(dateTime, datapointsTemperatura[helper - 1].getX());
+            }
+            else {
+                Double dataTemperatura = cursor.getDouble(cursor.getColumnIndex("valorMedicaoTemperatura"));
+                datapointsTemperatura[helper] = new DataPoint(dateTime, dataTemperatura);
+            }
             helper++;
         }
         return datapointsTemperatura;
@@ -219,21 +229,25 @@ public class GraphicActivity extends AppCompatActivity {
 
         //Ir a cada entrada, converter os minutos para decimais e por no grafico
         while (cursor.moveToNext()) {
-            Double dataHumidade = cursor.getDouble(cursor.getColumnIndex("valorMedicaoHumidade"));
 
             String dataHoraString = cursor.getString(cursor.getColumnIndex("dataHoraMedicao"));
-            Log.d("String da BD", dataHoraString);
 
             Date dateTime = new Date();
             DateFormat dataFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
             try {
                 dateTime = dataFormat.parse(dataHoraString);
             } catch (ParseException e) {
                 Log.e("DateTime message", "Parsing ISO8601 datetime failed", e);
             }
 
-            datapointsHumidade[helper] = new DataPoint(dateTime, dataHumidade);
+            if (cursor.isNull(cursor.getColumnIndex("valorMedicaoHumidade"))) {
+                if (helper == 0) datapointsHumidade[helper] = new DataPoint(dateTime, 0);
+                else datapointsHumidade[helper] = new DataPoint(dateTime, datapointsHumidade[helper - 1].getX());
+            }
+            else {
+                Double dataHumidade = cursor.getDouble(cursor.getColumnIndex("valorMedicaoHumidade"));
+                datapointsHumidade[helper] = new DataPoint(dateTime, dataHumidade);
+            }
             helper++;
         }
         return datapointsHumidade;

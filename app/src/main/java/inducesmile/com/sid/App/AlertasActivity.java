@@ -104,8 +104,8 @@ public class AlertasActivity extends AppCompatActivity {
 
             hora.setText(dateTime.split(" ")[1].split(":")[0] + ":" + dateTime.split(" ")[1].split(":")[1]);
 
-            data.setPadding(dpAsPixels(5), dpAsPixels(5), dpAsPixels(10),dpAsPixels(5));
-            hora.setPadding(dpAsPixels(5), dpAsPixels(5), dpAsPixels(15),dpAsPixels(5));
+            data.setPadding(dpAsPixels(5), dpAsPixels(5), dpAsPixels(5),dpAsPixels(5));
+            hora.setPadding(dpAsPixels(5), dpAsPixels(5), dpAsPixels(10),dpAsPixels(5));
 
             String alertidCultura = alertasCursor.getString(alertasCursor.getColumnIndex("idCultura"));
             if(alertidCultura.isEmpty() || alertidCultura.equals("null")) {
@@ -113,7 +113,7 @@ public class AlertasActivity extends AppCompatActivity {
             }
             TextView idCultura = new TextView(this);
             idCultura.setText(alertidCultura);
-            idCultura.setPadding(dpAsPixels(5), dpAsPixels(5), dpAsPixels(15),dpAsPixels(5));
+            idCultura.setPadding(dpAsPixels(5), dpAsPixels(5), dpAsPixels(5),dpAsPixels(5));
 
             String alertValorRegText = alertasCursor.getString(alertasCursor.getColumnIndex("valorReg"));
             if(alertValorRegText.isEmpty() || alertValorRegText.equals("null")) {
@@ -121,11 +121,11 @@ public class AlertasActivity extends AppCompatActivity {
             }
             TextView valorReg = new TextView(this);
             valorReg.setText(alertValorRegText);
-            valorReg.setPadding(dpAsPixels(5), dpAsPixels(5), dpAsPixels(10),dpAsPixels(5));
+            valorReg.setPadding(dpAsPixels(5), dpAsPixels(5), dpAsPixels(5),dpAsPixels(5));
 
             TextView tipoAlerta = new TextView(this);
             tipoAlerta.setText(alertasCursor.getString(alertasCursor.getColumnIndex("tipoAlerta")));
-            tipoAlerta.setPadding(dpAsPixels(5), dpAsPixels(5), dpAsPixels(20),dpAsPixels(5));
+            tipoAlerta.setPadding(dpAsPixels(5), dpAsPixels(5), dpAsPixels(10),dpAsPixels(5));
 
             idAlerta.setVisibility(View.INVISIBLE);
 

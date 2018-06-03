@@ -52,8 +52,15 @@ public class FetchDataFromURL {
                     JSONObject c = jsonHumidadeTemperatura.getJSONObject(i);
                     int idMedicao = c.getInt("idMedicao");
                     String dataHoraMedicao = c.getString("dataHoraMedicao");
-                    double valorMedicaoTemperatura = c.getDouble("valorMedicaoTemperatura");
-                    double valorMedicaoHumidade = c.getDouble("valorMedicaoHumidade");
+
+                    Double valorMedicaoTemperatura = null;
+                    Double valorMedicaoHumidade = null;
+
+                    if (!c.isNull("valorMedicaoTemperatura"))
+                        valorMedicaoTemperatura = c.getDouble("valorMedicaoTemperatura");
+
+                    if (!c.isNull("valorMedicaoHumidade"))
+                        valorMedicaoHumidade = c.getDouble("valorMedicaoHumidade");
 
                     db.insert_Humidade_Temperatura(idMedicao,dataHoraMedicao,valorMedicaoTemperatura,valorMedicaoHumidade);
                 }
@@ -116,8 +123,15 @@ public class FetchDataFromURL {
                     JSONObject c = jsonHumidadeTemperatura.getJSONObject(i);
                     int idMedicao = c.getInt("idMedicao");
                     String dataHoraMedicao = c.getString("dataHoraMedicao");
-                    double valorMedicaoTemperatura = c.getDouble("valorMedicaoTemperatura");
-                    double valorMedicaoHumidade = c.getDouble("valorMedicaoHumidade");
+
+                    Double valorMedicaoTemperatura = null;
+                    Double valorMedicaoHumidade = null;
+
+                    if (!c.isNull("valorMedicaoTemperatura"))
+                        valorMedicaoTemperatura = c.getDouble("valorMedicaoTemperatura");
+
+                    if (!c.isNull("valorMedicaoHumidade"))
+                        valorMedicaoHumidade = c.getDouble("valorMedicaoHumidade");
 
                     db.insert_Humidade_Temperatura(idMedicao,dataHoraMedicao,valorMedicaoTemperatura,valorMedicaoHumidade);
                 }
