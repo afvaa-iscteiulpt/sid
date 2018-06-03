@@ -135,7 +135,7 @@ public class AlertasActivity extends AppCompatActivity {
             row.addView(valorReg);
             row.addView(idCultura);
             row.addView(idAlerta);
-            
+
             row.setClickable(true);
 
             checkIfIsNewAlert(row, alertasCursor.getString(alertasCursor.getColumnIndex("idAlerta")));
