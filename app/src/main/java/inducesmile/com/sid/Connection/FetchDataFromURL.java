@@ -69,15 +69,17 @@ public class FetchDataFromURL {
                     String idCulturaResult = c.getString("idCultura");
                     String dataHoraMedicao = c.getString("dataHora");
                     String valorReg = c.getString("valorReg");
+                    Log.d("alerta vazio", valorReg);
 
-                    db.insert_Alertas(idAlerta,dataHoraMedicao,Double.valueOf(valorReg),idCulturaResult,tipoAlerta);
+                    db.insert_Alertas(idAlerta,dataHoraMedicao, valorReg,idCulturaResult,tipoAlerta);
+
                 }
 
             }
 
             JSONArray jsonCultura = jParser.getJSONFromUrl(READ_CULTURA,params);
             if (jsonCultura!=null){
-                for (int i = 1; i < jsonCultura.length(); i++) {
+                for (int i = 0; i < jsonCultura.length(); i++) {
 
                     JSONObject c = jsonCultura.getJSONObject(i);
 
@@ -132,7 +134,7 @@ public class FetchDataFromURL {
                     String dataHoraMedicao = c.getString("dataHora");
                     String valorReg = c.getString("valorReg");
 
-                    db.insert_Alertas(idAlerta,dataHoraMedicao,Double.valueOf(valorReg),idCulturaResult,tipoAlerta);
+                    db.insert_Alertas(idAlerta,dataHoraMedicao,valorReg,idCulturaResult,tipoAlerta);
                 }
 
             }

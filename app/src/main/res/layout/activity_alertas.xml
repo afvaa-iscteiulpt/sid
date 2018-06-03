@@ -28,82 +28,81 @@
         android:id="@+id/scroller"
         android:layout_width="0dp"
         android:layout_height="391dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="50dp"
         app:layout_constraintBottom_toTopOf="@+id/button2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/refreshButton">
+        app:layout_constraintTop_toTopOf="parent">
 
-        <HorizontalScrollView
+        <TableLayout
+            android:id="@+id/tableAlertas"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="55dp">
 
+            <TableRow
+                android:id="@+id/headerRow"
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:background="#d9d9d9"
+                android:gravity="start"
+                android:orientation="horizontal">
 
-            <TableLayout
-                android:id="@+id/tableAlertas"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <TableRow
-                    android:id="@+id/headerRow"
+                <TextView
+                    android:id="@+id/data"
                     android:layout_width="match_parent"
-                    android:layout_height="1px"
-                    android:background="#d9d9d9"
-                    android:gravity="start"
-                    android:orientation="horizontal">
+                    android:layout_height="match_parent"
+                    android:layout_gravity="start"
+                    android:padding="5dp"
+                    android:text="Data"
+                    android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/alerta"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="start"
-                        android:padding="5dp"
-                        android:text="Tipo Alerta"
-                        android:textStyle="bold"
-                        tools:layout_editor_absoluteX="199dp"
-                        tools:layout_editor_absoluteY="67dp" />
+                <TextView
+                    android:id="@+id/hora"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="start"
+                    android:padding="5dp"
+                    android:text="Hora"
+                    android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/valor"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="start"
-                        android:padding="5dp"
-                        android:text="Valor Registo"
-                        android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/alerta"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="start"
+                    android:padding="5dp"
+                    android:text="Tipo Alerta"
+                    android:textStyle="bold"
+                    tools:layout_editor_absoluteX="199dp"
+                    tools:layout_editor_absoluteY="67dp" />
 
-                    <TextView
-                        android:id="@+id/cultura"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="start"
-                        android:padding="5dp"
-                        android:text="Cultura"
-                        android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/valor"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="start"
+                    android:padding="5dp"
+                    android:text="Registo"
+                    android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/data"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="start"
-                        android:padding="5dp"
-                        android:text="Data"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/idalerta"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="start"
-                        android:padding="5dp"
-                        android:text="idAlerta"
-                        android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/cultura"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="start"
+                    android:padding="5dp"
+                    android:text="Cultura"
+                    android:textStyle="bold" />
 
 
-                </TableRow>
-            </TableLayout>
-
-        </HorizontalScrollView>
-
+            </TableRow>
+        </TableLayout>
     </ScrollView>
 
     <Button

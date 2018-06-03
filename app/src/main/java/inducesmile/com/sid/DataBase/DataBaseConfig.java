@@ -52,8 +52,8 @@ public class DataBaseConfig {
             "CREATE TABLE " + Alertas.TABLE_NAME +
                     " (" + Alertas.COLUMN_NAME_IDALERTA + " INTEGER," +
                     Alertas.COLUMN_NAME_DATAHORAMEDICAO + " DATETIME," +
-                    Alertas.COLUMN_NAME_VALORMEDICAO + " REAL," +
-                    Alertas.COLUMN_NAME_IDCULTURA + " INTEGER, "+
+                    Alertas.COLUMN_NAME_VALORMEDICAO + " TEXT," +
+                    Alertas.COLUMN_NAME_IDCULTURA + " TEXT, "+
                     Alertas.COLUMN_NAME_TIPOALERTAS + " TEXT )";
 
 

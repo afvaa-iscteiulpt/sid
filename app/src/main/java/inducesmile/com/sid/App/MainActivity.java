@@ -154,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
         while (cursor.moveToNext()){
             list.add(cursor.getString(cursor.getColumnIndex("nomeCultura")));
             culturasId.put(i,cursor.getInt(cursor.getColumnIndex("idCultura")));
+            Log.d("teste do spinner", cursor.getString(cursor.getColumnIndex("nomeCultura")));
             i++;
         }
 

@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 /**
  * Created by joao on 11/04/2018.
@@ -68,7 +69,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         getWritableDatabase().insert(DataBaseConfig.HumidadeTemperatura.TABLE_NAME,null,values);
     }
 
-    public void insert_Alertas(int idAlerta,String datahoraMedicao,double valorMedicao,String idCultura,String tipoAlerta){
+    public void insert_Alertas(int idAlerta,String datahoraMedicao,String valorMedicao,String idCultura,String tipoAlerta){
         ContentValues values = new ContentValues();
         values.put(DataBaseConfig.Alertas.COLUMN_NAME_IDALERTA,idAlerta);
         values.put(DataBaseConfig.Alertas.COLUMN_NAME_DATAHORAMEDICAO,datahoraMedicao);
