@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.LegendRenderer;
+import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.helper.StaticLabelsFormatter;
 import com.jjoe64.graphview.series.DataPoint;
@@ -24,6 +25,8 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import inducesmile.com.sid.Connection.FetchDataFromURL;
 import inducesmile.com.sid.DataBase.DataBaseConfig;
@@ -65,6 +68,22 @@ public class GraphicActivity extends AppCompatActivity {
             updateDates();
         }
 
+        Timer timer = new Timer();
+
+        timer.scheduleAtFixedRate(new TimerTask() {
+
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        refreshData(null);
+                    }
+                });
+            }
+        },60000,60000);
+
         insertDateString();
         drawGraph();
         setGraphScale();
@@ -74,8 +93,7 @@ public class GraphicActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 scale = i;
-                updateDates();
-                updateGraph();
+                refreshData(null);
             }
 
             @Override
@@ -91,9 +109,7 @@ public class GraphicActivity extends AppCompatActivity {
     }
 
     private void updateDates() {
-        beginDate.set(selectedDate.get(Calendar.YEAR),selectedDate.get(Calendar.MONTH),selectedDate.get(Calendar.DAY_OF_MONTH),0,0,0);
-        endDate.set(selectedDate.get(Calendar.YEAR),selectedDate.get(Calendar.MONTH),selectedDate.get(Calendar.DAY_OF_MONTH),0,0,0);
-        endDate.add(Calendar.DAY_OF_MONTH,1);
+        selectedDate = Calendar.getInstance();
 
         if (scale == 1) {
             beginDate.set(selectedDate.get(Calendar.YEAR),selectedDate.get(Calendar.MONTH),selectedDate.get(Calendar.DAY_OF_MONTH),
@@ -105,13 +121,17 @@ public class GraphicActivity extends AppCompatActivity {
         }
         else if (scale == 2) {
             beginDate.set(selectedDate.get(Calendar.YEAR),selectedDate.get(Calendar.MONTH),selectedDate.get(Calendar.DAY_OF_MONTH),
-                    selectedDate.get(Calendar.HOUR_OF_DAY),selectedDate.get(Calendar.MINUTE),selectedDate.get(Calendar.SECOND));
+                    selectedDate.get(Calendar.HOUR_OF_DAY),selectedDate.get(Calendar.MINUTE),0);
             beginDate.add(Calendar.MINUTE,-4);
             endDate.set(selectedDate.get(Calendar.YEAR),selectedDate.get(Calendar.MONTH),selectedDate.get(Calendar.DAY_OF_MONTH),
-                    selectedDate.get(Calendar.HOUR_OF_DAY),selectedDate.get(Calendar.MINUTE),selectedDate.get(Calendar.SECOND));
+                    selectedDate.get(Calendar.HOUR_OF_DAY),selectedDate.get(Calendar.MINUTE),0);
             endDate.add(Calendar.MINUTE,1);
         }
-
+        else {
+            beginDate.set(selectedDate.get(Calendar.YEAR),selectedDate.get(Calendar.MONTH),selectedDate.get(Calendar.DAY_OF_MONTH),0,0,0);
+            endDate.set(selectedDate.get(Calendar.YEAR),selectedDate.get(Calendar.MONTH),selectedDate.get(Calendar.DAY_OF_MONTH),0,0,0);
+            endDate.add(Calendar.DAY_OF_MONTH,1);
+        }
     }
 
     private void updateGraph() {
@@ -174,9 +194,8 @@ public class GraphicActivity extends AppCompatActivity {
         selectedDate = Calendar.getInstance();
         scale = 0;
 
-        updateDates();
+        refreshData(null);
         insertDateString();
-        updateGraph();
     }
 
     public void refreshData(View v) {
@@ -272,20 +291,21 @@ public class GraphicActivity extends AppCompatActivity {
         graph.getLegendRenderer().setVisible(true);
         graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
         graph.getLegendRenderer().setBackgroundColor(Color.alpha(0));
-    }
-
-    private void setGraphScale() {
         setDefaultAxisFormat();
-
-        graph.getViewport().setXAxisBoundsManual(true);
-        graph.getViewport().setMinX(beginDate.getTime().getTime());
-        graph.getViewport().setMaxX(endDate.getTime().getTime());
 
         graph.getViewport().setYAxisBoundsManual(true);
         graph.getViewport().setMinY(0);
         graph.getViewport().setMaxY(100);
+    }
 
+    private void setGraphScale() {
+        graph.getViewport().scrollToEnd();
+        graph.getGridLabelRenderer().setNumHorizontalLabels(3);
         graph.getGridLabelRenderer().setHumanRounding(false);
+
+        graph.getViewport().setXAxisBoundsManual(true);
+        graph.getViewport().setMinX(beginDate.getTime().getTime());
+        graph.getViewport().setMaxX(endDate.getTime().getTime());
     }
 
     private void setDefaultAxisFormat() {

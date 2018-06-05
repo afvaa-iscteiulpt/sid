@@ -234,7 +234,6 @@ public class FetchDataFromURL {
             params.put("password", password);
             params.put("datepickerDate",date);
             ConnectionHandler jParser = new ConnectionHandler();
-            db.dbClear();
 
             JSONArray jsonHumidadeTemperatura = jParser.getJSONFromUrl(READ_HUMIDADE_TEMPERATURA, params);
             if (jsonHumidadeTemperatura !=null){
@@ -253,37 +252,6 @@ public class FetchDataFromURL {
                         valorMedicaoHumidade = c.getDouble("valorMedicaoHumidade");
 
                     db.insert_Humidade_Temperatura(idMedicao,dataHoraMedicao,valorMedicaoTemperatura,valorMedicaoHumidade);
-                }
-            }
-
-            JSONArray jsonAlertas = jParser.getJSONFromUrl(READ_ALERTAS,params);
-            if (jsonAlertas!=null){
-                for (int i = 0; i < jsonAlertas.length(); i++) {
-                    JSONObject c = jsonAlertas.getJSONObject(i);
-
-                    int idAlerta = c.getInt("idAlerta");
-                    String tipoAlerta = c.getString("tipoAlerta");
-                    String idCulturaResult = c.getString("idCultura");
-                    String dataHoraMedicao = c.getString("dataHora");
-                    String valorReg = c.getString("valorReg");
-
-                    db.insert_Alertas(idAlerta,dataHoraMedicao,valorReg,idCulturaResult,tipoAlerta);
-                }
-
-            }
-
-            JSONArray jsonCultura = jParser.getJSONFromUrl(READ_CULTURA,params);
-            if (jsonCultura!=null){
-                for (int i = 1; i < jsonCultura.length(); i++) {
-
-                    JSONObject c = jsonCultura.getJSONObject(i);
-
-                    String nomeCultura = c.getString("nomeCultura");
-                    double limSupTempCultura = c.getDouble("limiteSuperiorTemperatura");
-                    double limInfTempCultura = c.getDouble("limiteInferiorTemperatura");
-                    double limSupHumiCultura = c.getDouble("limiteSuperiorHumidade");
-                    double limInfHumiCultura = c.getDouble("limiteInferiorHumidade");
-                    db.insert_Cultura(c.getInt("idCultura"),nomeCultura,limSupTempCultura,limInfTempCultura,limSupHumiCultura,limInfHumiCultura);
                 }
             }
         }catch (JSONException e) {

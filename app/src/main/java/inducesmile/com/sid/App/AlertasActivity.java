@@ -53,6 +53,7 @@ public class AlertasActivity extends AppCompatActivity {
         TableLayout table = findViewById(R.id.tableAlertas);
         table.removeViews(1, numAlertas);
         numAlertas = 0;
+        ultimoId = -1;
 
         while (alertasCursor.moveToNext()){
             if (ultimoId == -1)
@@ -186,7 +187,6 @@ public class AlertasActivity extends AppCompatActivity {
     }
 
     public void mainActivityRefreshDB(View v) {
-        Button button = findViewById(R.id.refreshButton);
         if (ultimoId != -1) FetchDataFromURL.fetchAlertasAfterID(this, ultimoId);
         listAlertas(getAlertasCursor());
     }
