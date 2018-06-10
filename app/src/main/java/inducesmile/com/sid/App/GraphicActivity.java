@@ -109,8 +109,6 @@ public class GraphicActivity extends AppCompatActivity {
     }
 
     private void updateDates() {
-        selectedDate = Calendar.getInstance();
-
         if (scale == 1) {
             beginDate.set(selectedDate.get(Calendar.YEAR),selectedDate.get(Calendar.MONTH),selectedDate.get(Calendar.DAY_OF_MONTH),
                     selectedDate.get(Calendar.HOUR_OF_DAY),selectedDate.get(Calendar.MINUTE),0);
@@ -151,6 +149,7 @@ public class GraphicActivity extends AppCompatActivity {
             graph.removeAllSeries();
         }
         else {
+            Log.d("tamanho temp", String.valueOf(temp.length));
             if (temp.length != 0) seriesTemperatura.resetData(temp);
             if (humi.length != 0) seriesHumidade.resetData(humi);
         }
@@ -171,7 +170,10 @@ public class GraphicActivity extends AppCompatActivity {
         reader = new DataBaseReader(db);
         DateFormat dataFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        Cursor cursor = reader.ReadHumidadeTemperatura(dataFormat.format(beginDate.getTime()));
+        Cursor cursor = reader.ReadHumidadeTemperatura(dataFormat.format(beginDate.getTime()),dataFormat.format(endDate.getTime()));
+        Log.d("data inicio", String.valueOf(beginDate.get(Calendar.DAY_OF_MONTH)));
+        Log.d("data fim", String.valueOf(endDate.get(Calendar.DAY_OF_MONTH)));
+        Log.d("cursor lenght", String.valueOf(cursor.getCount()));
         return cursor;
     }
 

@@ -23,16 +23,16 @@ public class DataBaseReader {
     // https://stackoverflow.com/questions/10600670/sqlitedatabase-query-method
 
 
-    public Cursor ReadHumidadeTemperatura(String date){
+    public Cursor ReadHumidadeTemperatura(String firstDate, String secondDate){
 
         Cursor cursor = db.query(
                 DataBaseConfig.HumidadeTemperatura.TABLE_NAME,   // Nome da tabela
                 null,
-                "dataHoraMedicao >=?",
-                new String[]{date},
+                "dataHoraMedicao >=? AND dataHoraMedicao <?",
+                new String[]{firstDate, secondDate},
                 null,
                 null,
-                null
+                "idMedicao"
         );
         return cursor;
     }

@@ -229,6 +229,7 @@ public class FetchDataFromURL {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
             HashMap<String, String> params = new HashMap<>();
+            db.dbClearMedicoes();
 
             params.put("username", username);
             params.put("password", password);
