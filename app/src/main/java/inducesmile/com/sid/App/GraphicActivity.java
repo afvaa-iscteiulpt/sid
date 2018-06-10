@@ -300,7 +300,9 @@ public class GraphicActivity extends AppCompatActivity {
 
     private void setGraphScale() {
         graph.getViewport().scrollToEnd();
-        graph.getGridLabelRenderer().setNumHorizontalLabels(3);
+        if (scale == 0) graph.getGridLabelRenderer().setNumHorizontalLabels(0);
+        else graph.getGridLabelRenderer().setNumHorizontalLabels(2);
+
         graph.getGridLabelRenderer().setHumanRounding(false);
 
         graph.getViewport().setXAxisBoundsManual(true);
@@ -320,6 +322,5 @@ public class GraphicActivity extends AppCompatActivity {
                 else return super.formatLabel(value, isValueX);
             }
         });
-        graph.getGridLabelRenderer().setNumHorizontalLabels(3); // only 4 because of the space
     }
 }
